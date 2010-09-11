@@ -29,7 +29,7 @@ class TestShamir < Test::Unit::TestCase
 		assert_equal(s.secret_bitlength, DEFAULT_SECRET_BITLENGTH)
 
 		# can only be called once
-		assert_raise( RunTimeError) { s.create_random_secret() }
+		assert_raise( RuntimeError) { s.create_random_secret() }
 
 		s2 = SecretSharing::Shamir.new(7)
 		s2.create_random_secret(256)
@@ -46,7 +46,7 @@ class TestShamir < Test::Unit::TestCase
 		assert(! s2.secret_set?)
 		assert_nil(s2.secret)
 		# adding the same share raises an error
-		assert_raise( RunTimeError ) { s2.shares << s.shares[0] }
+		assert_raise( RuntimeError ) { s2.shares << s.shares[0] }
 		# add more shares
 		s2.shares << s.shares[1]
 		assert(! s2.secret_set?)
@@ -76,6 +76,6 @@ class TestShamir < Test::Unit::TestCase
 		assert_equal(s.secret, s2.secret)
 
 		# adding more shares than needed raises an error
-		assert_raise( RunTimeError ) { s2.shares << s.shares[3] }
+		assert_raise( RuntimeError ) { s2.shares << s.shares[3] }
 	end	
 end
