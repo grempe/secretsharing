@@ -2,7 +2,7 @@ require 'openssl'
 
 module SecretSharing
 	class Shamir
-		attr_reader :n, :k, :secret, :shares
+		attr_reader :n, :k, :secret, :secret_bitlength, :shares
 
 		DEFAULT_SECRET_BITLENGTH = 128
 
@@ -23,6 +23,7 @@ module SecretSharing
 		def create_random_secret(bitlength = DEFAULT_SECRET_BITLENGTH)
 			raise RuntimeError, 'secret already set' if secret_set?
 			@secret = get_random_number(bitlength)
+			@secret_bitlength = bitlength
 		end
 
 		private
