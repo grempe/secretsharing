@@ -10,6 +10,9 @@ module SecretSharing
 			if k > n then
 				raise ArgumentError, 'k must be smaller or equal than n'
 			end	
+			if k < 2 then
+				raise ArgumentError, 'k must be greater or equal to two'
+			end
 			@n = n
 			@k = k
 			@secret = nil
