@@ -27,6 +27,20 @@ module SecretSharing
 			raise RuntimeError, 'secret already set' if secret_set?
 			@secret = get_random_number(bitlength)
 			@secret_bitlength = bitlength
+			create_shares
+		end
+
+		def self.smallest_prime_of_bitlength(bitlength)
+      # start with 2^bit_length + 1
+			test_prime = OpenSSL::BN.new((2**bitlength + 1).to_s)	
+			prime_found = false
+			while (! prime_found) do
+				# prime_fasttest? 20 do be compatible to
+				# openssl prime, which is used in OpenXPKI::Crypto::Secret::Split
+				prime_found = test_prime.prime_fasttest? 20
+				test_prime += 2
+			end
+			test_prime
 		end
 
 		private
@@ -45,5 +59,54 @@ module SecretSharing
 			end	
 			rand
 		end
+
+		def create_shares
+			@coefficients = []
+			@coefficients[0] = @secret
+
+      # round up to next nibble
+			next_nibble_bitlength = @secret_bitlength + (4 - (@secret_bitlength % 4))
+			prime_bitlength = next_nibble_bitlength + 1
+			@prime = self.class.smallest_prime_of_bitlength(prime_bitlength)
+
+      # compute random coefficients
+			(1..k-1).each do |x|
+				@coefficients[x] = get_random_number(@secret_bitlength)
+			end
+
+			(1..n).each do |x|
+				@shares[x-1] = construct_share(x, prime_bitlength)
+			end
+		end	
+
+		def construct_share(x, bitlength)
+			p_x = evaluate_polynomial_at(x)
+			SecretSharing::Shamir::Share.new(x, p_x, @prime, bitlength)
+		end
+
+		def evaluate_polynomial_at(x)
+			result = OpenSSL::BN.new('0')
+			@coefficients.each_with_index do |coeff, i|
+				result += coeff * OpenSSL::BN.new(x.to_s)**i
+				result %= @prime
+			end
+			result
+		end
 	end
+
+	class SecretSharing::Shamir::Share
+		attr_reader :x, :y, :prime_bitlength, :prime
+		def initialize(x, y, prime, prime_bitlength)
+			@x = x
+			@y = y
+			@prime = prime
+			@prime_bitlength = prime_bitlength
+		end
+
+		def from_string(string)
+		end
+
+		#def to_s
+		#end
+	end	
 end

@@ -15,6 +15,7 @@ class TestShamir < Test::Unit::TestCase
 		assert_equal(3, s2.k)
 		assert(! s2.secret_set?)
 		assert_raise( ArgumentError ) { SecretSharing::Shamir.new(5, 7) }
+		assert_raise( ArgumentError ) { SecretSharing::Shamir.new(1) }
 	end
 
 	def test_create_random_secret
