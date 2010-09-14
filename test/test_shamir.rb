@@ -42,20 +42,20 @@ class TestShamir < Test::Unit::TestCase
 		s.create_random_secret()
 		
 		s2 = SecretSharing::Shamir.new(5)
-		s2.shares << s.shares[0]
+		s2 << s.shares[0]
 		assert_equal(1, s2.shares.length)
 		assert(! s2.secret_set?)
 		assert_nil(s2.secret)
 		# adding the same share raises an error
-		assert_raise( RuntimeError ) { s2.shares << s.shares[0] }
+		assert_raise( RuntimeError ) { s2 << s.shares[0] }
 		# add more shares
-		s2.shares << s.shares[1]
+		s2 << s.shares[1]
 		assert(! s2.secret_set?)
-		s2.shares << s.shares[2]
+		s2 << s.shares[2]
 		assert(! s2.secret_set?)
-		s2.shares << s.shares[3]
+		s2 << s.shares[3]
 		assert(! s2.secret_set?)
-		s2.shares << s.shares[4]
+		s2 << s.shares[4]
 		assert(s2.secret_set?)
 		assert_equal(s.secret, s2.secret)
 	end
@@ -65,18 +65,18 @@ class TestShamir < Test::Unit::TestCase
 		s.create_random_secret()
 		
 		s2 = SecretSharing::Shamir.new(5, 3)
-		s2.shares << s.shares[0]
+		s2 << s.shares[0]
 		assert_equal(1, s2.shares.length)
 		assert(! s2.secret_set?)
 		assert_nil(s2.secret)
 		# add more shares
-		s2.shares << s.shares[1]
+		s2 << s.shares[1]
 		assert(! s2.secret_set?)
-		s2.shares << s.shares[2]
+		s2 << s.shares[2]
 		assert(s2.secret_set?)
 		assert_equal(s.secret, s2.secret)
 
 		# adding more shares than needed raises an error
-		assert_raise( RuntimeError ) { s2.shares << s.shares[3] }
+		assert_raise( RuntimeError ) { s2 << s.shares[3] }
 	end	
 end
