@@ -17,6 +17,7 @@ module SecretSharing
 			@k = k
 			@secret = nil
 			@shares = []
+			@received_shares = []
 		end
 
 		def secret_set?
@@ -24,14 +25,37 @@ module SecretSharing
 		end
 
 		def create_random_secret(bitlength = DEFAULT_SECRET_BITLENGTH)
-			raise RuntimeError, 'secret already set' if secret_set?
+			raise 'secret already set' if secret_set?
 			@secret = get_random_number(bitlength)
 			@secret_bitlength = bitlength
 			create_shares
 		end
 
+		def <<(share)
+			# convert from string if needed
+			if share.class != SecretSharing::Shamir::Share then
+				if share.class == String then
+					share = SecretSharing::Shamir::Share.from_string(share)
+				else
+					raise ArgumentError 'SecretSharing::Shamir::Share or String needed'
+				end
+			end
+			if @received_shares.include? share then
+				raise 'share has already been added'
+			end
+			if @received_shares.length == @k then
+				raise 'we already have enough shares, no need to add more'
+			end
+			@received_shares << share
+			if @received_shares.length == @k then
+				recover_secret
+				return true
+			end
+			false
+		end
+
 		def self.smallest_prime_of_bitlength(bitlength)
-      # start with 2^bit_length + 1
+			# start with 2^bit_length + 1
 			test_prime = OpenSSL::BN.new((2**bitlength + 1).to_s)	
 			prime_found = false
 			while (! prime_found) do
@@ -64,12 +88,12 @@ module SecretSharing
 			@coefficients = []
 			@coefficients[0] = @secret
 
-      # round up to next nibble
+			# round up to next nibble
 			next_nibble_bitlength = @secret_bitlength + (4 - (@secret_bitlength % 4))
 			prime_bitlength = next_nibble_bitlength + 1
 			@prime = self.class.smallest_prime_of_bitlength(prime_bitlength)
 
-      # compute random coefficients
+			# compute random coefficients
 			(1..k-1).each do |x|
 				@coefficients[x] = get_random_number(@secret_bitlength)
 			end
@@ -91,6 +115,27 @@ module SecretSharing
 				result %= @prime
 			end
 			result
+		end
+
+		def recover_secret
+			@secret = OpenSSL::BN.new('0')
+			@received_shares.each do |share|
+				summand = share.y * l(share.x, @received_shares)
+				summand %= share.prime
+				@secret += summand
+				@secret %= share.prime
+			end
+		end
+		
+		# this is l_j(0), i.e.
+		# \prod_{x_j \neq x_i} \frac{-x_i}{x_j - x_i}
+		# for more information compare Wikipedia:
+		# http://en.wikipedia.org/wiki/Lagrange_form
+		def l(x, shares)
+			shares.select { |s| s.x != x }.map do |s|
+				factor = OpenSSL::BN.new((-s.x).to_s) * 
+						 OpenSSL::BN.new((x - s.x).to_s).mod_inverse(shares[0].prime)
+			end.inject { |p, f| p.mod_mul(f, shares[0].prime) }
 		end
 	end
 

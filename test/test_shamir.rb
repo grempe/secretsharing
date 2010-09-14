@@ -43,7 +43,6 @@ class TestShamir < Test::Unit::TestCase
 		
 		s2 = SecretSharing::Shamir.new(5)
 		s2 << s.shares[0]
-		assert_equal(1, s2.shares.length)
 		assert(! s2.secret_set?)
 		assert_nil(s2.secret)
 		# adding the same share raises an error
@@ -66,7 +65,6 @@ class TestShamir < Test::Unit::TestCase
 		
 		s2 = SecretSharing::Shamir.new(5, 3)
 		s2 << s.shares[0]
-		assert_equal(1, s2.shares.length)
 		assert(! s2.secret_set?)
 		assert_nil(s2.secret)
 		# add more shares
