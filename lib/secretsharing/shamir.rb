@@ -133,8 +133,8 @@ module SecretSharing
 		# http://en.wikipedia.org/wiki/Lagrange_form
 		def l(x, shares)
 			shares.select { |s| s.x != x }.map do |s|
-				factor = OpenSSL::BN.new((-s.x).to_s) * 
-						 OpenSSL::BN.new((x - s.x).to_s).mod_inverse(shares[0].prime)
+				OpenSSL::BN.new((-s.x).to_s) * 
+				OpenSSL::BN.new((x - s.x).to_s).mod_inverse(shares[0].prime)
 			end.inject { |p, f| p.mod_mul(f, shares[0].prime) }
 		end
 	end
