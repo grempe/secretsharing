@@ -4,7 +4,7 @@ module SecretSharing
 	class Shamir
 		attr_reader :n, :k, :secret, :secret_bitlength, :shares
 
-		DEFAULT_SECRET_BITLENGTH = 128
+		DEFAULT_SECRET_BITLENGTH = 256
 
 		def initialize(n, k=n)
 			if k > n then
@@ -29,6 +29,7 @@ module SecretSharing
 			@secret = get_random_number(bitlength)
 			@secret_bitlength = bitlength
 			create_shares
+                        @secret
 		end
 
 		def <<(share)
