@@ -14,6 +14,11 @@ module SecretSharing
 	# To share a secret, create a new SecretSharing::Shamir object and
 	# then call the create_random_secret() method. The secret is now in
 	# the secret attribute and the shares are an array in the shares attribute.
+	#
+	# To recover a secret, create a SecretSharing::Shamir object and
+	# add the necessary shares to it using the '<<' method. Once enough
+	# shares have been added, the secret can be recovered in the secret
+	# attribute.
 	class Shamir
 		attr_reader :n, :k, :secret, :secret_bitlength, :shares
 
