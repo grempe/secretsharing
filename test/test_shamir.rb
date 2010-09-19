@@ -1,7 +1,7 @@
 require 'test/unit'
 require 'lib/secretsharing/shamir'
 
-DEFAULT_SECRET_BITLENGTH = 128
+DEFAULT_SECRET_BITLENGTH = 256
 
 class TestShamir < Test::Unit::TestCase
 	def test_instantiation
@@ -33,8 +33,8 @@ class TestShamir < Test::Unit::TestCase
 		assert_raise( RuntimeError) { s.create_random_secret() }
 
 		s2 = SecretSharing::Shamir.new(7)
-		s2.create_random_secret(256)
-		assert_equal(256, s2.secret_bitlength)
+		s2.create_random_secret(512)
+		assert_equal(512, s2.secret_bitlength)
 	end
 
 	def test_recover_secret_k_eq_n
@@ -71,6 +71,25 @@ class TestShamir < Test::Unit::TestCase
 		s2 << s.shares[1]
 		assert(! s2.secret_set?)
 		s2 << s.shares[2]
+		assert(s2.secret_set?)
+		assert_equal(s.secret, s2.secret)
+
+		# adding more shares than needed raises an error
+		assert_raise( RuntimeError ) { s2 << s.shares[3] }
+	end	
+
+	def test_recover_secret_k_le_n_strings
+		s = SecretSharing::Shamir.new(5, 3)
+		s.create_random_secret()
+		
+		s2 = SecretSharing::Shamir.new(5, 3)
+		s2 << "#{s.shares[0]}"
+		assert(! s2.secret_set?)
+		assert_nil(s2.secret)
+		# add more shares
+		s2 << "#{s.shares[1]}"
+		assert(! s2.secret_set?)
+		s2 << s.shares[2].to_s
 		assert(s2.secret_set?)
 		assert_equal(s.secret, s2.secret)
 
