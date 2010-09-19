@@ -67,7 +67,7 @@ module SecretSharing
 			@secret
 		end
 
-		# Add a secret share to the object. Accepts but a SecretSharing::Shamir::Share
+		# Add a secret share to the object. Accepts either a SecretSharing::Shamir::Share
 		# instance or a string representing one. Returns true if enough shares have
 		# been added to recover the secret, false otherweise.
 		def <<(share)
