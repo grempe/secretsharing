@@ -2,7 +2,7 @@ require 'rubygems'
 
 spec = Gem::Specification.new do |gem|
     gem.name        = 'secretsharing'
-    gem.version     = '0.1'
+    gem.version     = '0.2'
     gem.author      = 'Alexander Klink'
     gem.email       = 'secretsharing@alech.de'
     gem.platform    = Gem::Platform::RUBY
