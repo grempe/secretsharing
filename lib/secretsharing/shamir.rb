@@ -170,11 +170,13 @@ module SecretSharing
 		def recover_secret
 			@secret = OpenSSL::BN.new('0')
 			@received_shares.each do |share|
-				summand = share.y * l(share.x, @received_shares)
+				l_x = l(share.x, @received_shares)
+				summand = share.y * l_x
 				summand %= share.prime
 				@secret += summand
 				@secret %= share.prime
 			end
+			@secret
 		end
 		
 		# Part of the Lagrange interpolation.
@@ -183,10 +185,12 @@ module SecretSharing
 		# for more information compare Wikipedia:
 		# http://en.wikipedia.org/wiki/Lagrange_form
 		def l(x, shares)
-			shares.select { |s| s.x != x }.map do |s|
-				OpenSSL::BN.new((-s.x).to_s) * 
-				OpenSSL::BN.new((x - s.x).to_s).mod_inverse(shares[0].prime)
-			end.inject { |p, f| p.mod_mul(f, shares[0].prime) }
+			(shares.select { |s| s.x != x }.map do |s|
+				minus_xi = OpenSSL::BN.new((-s.x).to_s)
+				one_over_xj_minus_xi = OpenSSL::BN.new((x - s.x).to_s) \
+				                       .mod_inverse(shares[0].prime)
+				minus_xi.mod_mul(one_over_xj_minus_xi, shares[0].prime)
+			end.inject { |p, f| p.mod_mul(f, shares[0].prime) })
 		end
 	end
 

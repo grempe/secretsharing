@@ -59,6 +59,17 @@ class TestShamir < Test::Unit::TestCase
 		assert_equal(s.secret, s2.secret)
 	end
 
+	def test_recover_secret_k_eq_n_strings
+		s = SecretSharing::Shamir.new(2)
+		s.create_random_secret()
+
+		s2 = SecretSharing::Shamir.new(2)
+		s2 << s.shares[0].to_s
+		s2 << s.shares[1].to_s
+
+		assert_equal(s.secret, s2.secret)
+	end
+
 	def test_recover_secret_k_le_n
 		s = SecretSharing::Shamir.new(5, 3)
 		s.create_random_secret()
