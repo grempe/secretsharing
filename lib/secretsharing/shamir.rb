@@ -1,5 +1,6 @@
 require 'openssl'
 require 'digest/sha1'
+require 'base64'
 
 module SecretSharing
 	# The SecretSharing::Shamir class can be used to share random
@@ -65,6 +66,14 @@ module SecretSharing
 			@secret_bitlength = bitlength
 			create_shares
 			@secret
+		end
+
+		# The secret in a password representation (Base64-encoded)
+		def secret_password
+			if ! secret_set? then
+				raise "Secret not (yet) set."
+			end
+			Base64.encode64([@secret.to_s(16)].pack('h*')).split("\n").join
 		end
 
 		# Add a secret share to the object. Accepts either a SecretSharing::Shamir::Share

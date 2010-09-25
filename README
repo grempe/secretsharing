@@ -27,6 +27,9 @@
    # show secret
    puts s.secret
 
+   # show password representation of secret (Base64)
+   puts s.secret_password
+
    # show shares
    s.shares.each { |share| puts share }
 

@@ -1,5 +1,6 @@
 == v0.2
    Bugfix in Langrange interpolation, which broke 2/2 sharing.
+   Added secret_password method to represent the secret in Base64.
 
 == v0.1
    Initial version
