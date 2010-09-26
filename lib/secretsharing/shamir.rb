@@ -76,16 +76,18 @@ module SecretSharing
 			Base64.encode64([@secret.to_s(16)].pack('h*')).split("\n").join
 		end
 
-		# Add a secret share to the object. Accepts either a SecretSharing::Shamir::Share
-		# instance or a string representing one. Returns true if enough shares have
-		# been added to recover the secret, false otherweise.
+		# Add a secret share to the object. Accepts either a
+		# SecretSharing::Shamir::Share instance or a string representing one.
+		# Returns true if enough shares have been added to recover the secret,
+		# false otherweise.
 		def <<(share)
 			# convert from string if needed
 			if share.class != SecretSharing::Shamir::Share then
 				if share.class == String then
 					share = SecretSharing::Shamir::Share.from_string(share)
 				else
-					raise ArgumentError 'SecretSharing::Shamir::Share or String needed'
+					raise ArgumentError 'SecretSharing::Shamir::Share ' \
+					                  + 'or String needed'
 				end
 			end
 			if @received_shares.include? share then
@@ -111,7 +113,8 @@ module SecretSharing
 			prime_found = false
 			while (! prime_found) do
 				# prime_fasttest? 20 do be compatible to
-				# openssl prime, which is used in OpenXPKI::Crypto::Secret::Split
+				# openssl prime, which is used in
+				# OpenXPKI::Crypto::Secret::Split
 				prime_found = test_prime.prime_fasttest? 20
 				test_prime += 2
 			end
@@ -119,11 +122,12 @@ module SecretSharing
 		end
 
 		private
-		# Creates a random number of a certain bitlength, optionally ensuring the
-		# bitlength by setting the highest bit to 1.
+		# Creates a random number of a certain bitlength, optionally ensuring
+		# the bitlength by setting the highest bit to 1.
 		def get_random_number(bitlength, highest_bit_one = true)
 			byte_length = (bitlength / 8.0).ceil
-			rand_hex = OpenSSL::Random.random_bytes(byte_length).each_byte.to_a.map { |a| "%02x" % a }.join('')
+			rand_hex = OpenSSL::Random.random_bytes(byte_length).each_byte. \
+			                           to_a.map { |a| "%02x" % a }.join('')
 			rand = OpenSSL::BN.new(rand_hex, 16)
 			begin
 				rand.mask_bits!(bitlength)
@@ -144,7 +148,8 @@ module SecretSharing
 			@coefficients[0] = @secret
 
 			# round up to next nibble
-			next_nibble_bitlength = @secret_bitlength + (4 - (@secret_bitlength % 4))
+			next_nibble_bitlength = @secret_bitlength + \
+			                        (4 - (@secret_bitlength % 4))
 			prime_bitlength = next_nibble_bitlength + 1
 			@prime = self.class.smallest_prime_of_bitlength(prime_bitlength)
 
@@ -232,9 +237,11 @@ module SecretSharing
 			checksum = string[-6, 4]
 			computed_checksum = Digest::SHA1.hexdigest(p_x_str)[0,4].upcase
 			if checksum != computed_checksum then
-				raise "invalid checksum. expected #{checksum}, got #{computed_checksum}"
+				raise "invalid checksum. expected #{checksum}, " + \
+				      "got #{computed_checksum}"
 			end
-			prime = SecretSharing::Shamir.smallest_prime_of_bitlength(prime_bitlength)
+			prime = SecretSharing::Shamir. \ 
+			        smallest_prime_of_bitlength(prime_bitlength)
 			self.new(x, OpenSSL::BN.new(p_x_str, 16), prime, prime_bitlength)
 		end
 
@@ -244,15 +251,15 @@ module SecretSharing
 		# format: ABBC*DDDDEEEE, where
 		# * A (the first nibble) is the version number of the format, currently
 		#   fixed to 0.
-		# * B (the next byte, two hex characters) is the x coordinate of the point
-		#   on the polynomial.
-		# * C (the next variable length of bytes) is the y coordinate of the point
-		#   on the polynomial.
-		# * D (the next two bytes, four hex characters) is the two highest bytes of
-		#   the SHA1 hash on the string representing the y coordinate, it is used as
-		#   a checksum to guard against typos
-		# * E (the next two bytes, four hex characters) is the bitlength of the prime
-		#   number in nibbles.
+		# * B (the next byte, two hex characters) is the x coordinate of the
+		#   point on the polynomial.
+		# * C (the next variable length of bytes) is the y coordinate of the
+		#   point on the polynomial.
+		# * D (the next two bytes, four hex characters) is the two highest
+		#   bytes of the SHA1 hash on the string representing the y coordinate,
+		#   it is used as a checksum to guard against typos
+		# * E (the next two bytes, four hex characters) is the bitlength of the
+		#   prime number in nibbles.
 		def to_s
 			# bitlength in nibbles to save space
 			prime_nibbles = (@prime_bitlength - 1) / 4 
