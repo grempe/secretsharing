@@ -262,5 +262,10 @@ module SecretSharing
 				+ Digest::SHA1.hexdigest(p_x)[0,4].upcase \
 				+ ("%02x" % prime_nibbles).upcase
 		end
+
+		# Shares are equal if their string representation is the same.
+		def ==(share)
+			share.to_s == self.to_s
+		end
 	end	
 end
