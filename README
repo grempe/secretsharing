@@ -43,11 +43,8 @@
    s2 << s.shares[4]
    puts s2.secret
 
-== Future Plans
-   Add support for using your own instead of a random secret.
-
 == Copyright
-   (c) 2010 Alexander Klink
+   (c) 2010-2011 Alexander Klink
 
 == License
    Licensed under the Apache License, Version 2.0 (the "License");

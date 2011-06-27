@@ -37,6 +37,33 @@ class TestShamir < Test::Unit::TestCase
 		assert_equal(512, s2.secret_bitlength)
 	end
 
+	def test_set_fixed_secret
+		s = SecretSharing::Shamir.new(5)
+		s.set_fixed_secret(OpenSSL::BN.new('12345678901234567890'))
+		assert(s.secret_set?)
+		assert_not_nil(s.secret)
+		assert_not_nil(s.shares)
+		assert_equal(Array, s.shares.class)
+		assert_equal(5, s.shares.length)
+		assert_equal(SecretSharing::Shamir::Share, s.shares[0].class)
+		assert_equal(64, s.secret_bitlength)
+
+		# can only be called once
+		assert_raise( RuntimeError) { 
+			s.set_fixed_secret(OpenSSL::BN.new('12345678901234567891')) }
+
+		# test using string as parameter instead of OpenSSL::BN instance
+		s2 = SecretSharing::Shamir.new(5)
+		s2.set_fixed_secret('12345678901234567890')
+		assert(s2.secret_set?)
+		assert_not_nil(s2.secret)
+		assert_not_nil(s2.shares)
+		assert_equal(Array, s2.shares.class)
+		assert_equal(5, s2.shares.length)
+		assert_equal(SecretSharing::Shamir::Share, s2.shares[0].class)
+		assert_equal(64, s2.secret_bitlength)
+	end
+
 	def test_recover_secret_k_eq_n
 		s = SecretSharing::Shamir.new(5)
 		s.create_random_secret()
@@ -57,6 +84,30 @@ class TestShamir < Test::Unit::TestCase
 		s2 << s.shares[4]
 		assert(s2.secret_set?)
 		assert_equal(s.secret, s2.secret)
+	end
+
+	def test_recover_secret_k_eq_n_fixed_secret
+		s = SecretSharing::Shamir.new(5)
+		secret = OpenSSL::BN.new('1234567890123456789012345678901234567890')
+
+		s.set_fixed_secret(secret)
+		
+		s2 = SecretSharing::Shamir.new(5)
+		s2 << s.shares[0]
+		assert(! s2.secret_set?)
+		assert_nil(s2.secret)
+		# adding the same share raises an error
+		assert_raise( RuntimeError ) { s2 << s.shares[0] }
+		# add more shares
+		s2 << s.shares[1]
+		assert(! s2.secret_set?)
+		s2 << s.shares[2]
+		assert(! s2.secret_set?)
+		s2 << s.shares[3]
+		assert(! s2.secret_set?)
+		s2 << s.shares[4]
+		assert(s2.secret_set?)
+		assert_equal(secret, s2.secret)
 	end
 
 	def test_recover_secret_k_eq_n_strings

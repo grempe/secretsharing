@@ -16,6 +16,10 @@ module SecretSharing
 	# then call the create_random_secret() method. The secret is now in
 	# the secret attribute and the shares are an array in the shares attribute.
 	#
+	# Alternatively, you can call the set_fixed_secret() method with an
+	# OpenSSL::BN object (or something that can be passed to OpenSSL::BN.new)
+	# to set your own secret.
+	#
 	# To recover a secret, create a SecretSharing::Shamir object and
 	# add the necessary shares to it using the '<<' method. Once enough
 	# shares have been added, the secret can be recovered in the secret
@@ -64,6 +68,22 @@ module SecretSharing
 			raise 'max bitlength is 1024' if bitlength > 1024
 			@secret = get_random_number(bitlength)
 			@secret_bitlength = bitlength
+			create_shares
+			@secret
+		end
+
+		# Set the secret to a fixed OpenSSL::BN value. Stores it
+		# in the 'secret' attribute, creates the corresponding shares and
+		# returns the secret
+		def set_fixed_secret(secret)
+			raise 'secret already set' if secret_set?
+			if secret.class != OpenSSL::BN then
+				# create OpenSSL bignum
+				secret = OpenSSL::BN.new(secret)
+			end
+			raise 'max bitlength is 1024' if secret.num_bits > 1024
+			@secret = secret
+			@secret_bitlength = secret.num_bits
 			create_shares
 			@secret
 		end
@@ -240,7 +260,7 @@ module SecretSharing
 				raise "invalid checksum. expected #{checksum}, " + \
 				      "got #{computed_checksum}"
 			end
-			prime = SecretSharing::Shamir. \ 
+			prime = SecretSharing::Shamir. \
 			        smallest_prime_of_bitlength(prime_bitlength)
 			self.new(x, OpenSSL::BN.new(p_x_str, 16), prime, prime_bitlength)
 		end

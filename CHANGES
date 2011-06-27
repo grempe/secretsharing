@@ -1,3 +1,7 @@
+== v0.3
+   Added support for setting your own secret using the set_fixed_secret()
+   method.
+
 == v0.2
    Bugfix in Langrange interpolation, which broke 2/2 sharing.
    Added secret_password method to represent the secret in Base64.
