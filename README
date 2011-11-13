@@ -9,20 +9,34 @@
    for the OpenXPKI project in 2006.
 
 == Prerequisites
-   This package requires Ruby 1.8 or later.
+   This package requires Ruby 1.8.7 or later.
 
-== Installation instructions
-   rake test (optional)
-   rake install (non-gem) or rake install_gem (gem)
+   The 'bundler' gem should be installed if you want to
+   do development or testing for this gem.
 
-== Synopsis
+== Installation Instructions
+
+   gem install secretsharing
+
+   - or -
+
+   # Add the following to your Gemfile
+   gem "secretsharing", ">=0.3"
+
+== Installation Instructions for Development
+   bundle install
+   rake test
+   rake install
+
+== Usage
+
    require 'secretsharing'
 
    # create an object for 3 out of 5 secret sharing
    s = SecretSharing::Shamir.new(5,3)
 
    # create a random secret (returns the secret)
-   s.create_random_secret()
+   s.create_random_secret
 
    # show secret
    puts s.secret
@@ -34,9 +48,9 @@
    s.shares.each { |share| puts share }
 
    # recover secret from shares
-
    s2 = SecretSharing::Shamir.new(3)
-   # accepts SecretSharing::Shamir::Share objects or
+
+   # Accepts SecretSharing::Shamir::Share objects or
    # string representations thereof
    s2 << s.shares[0]
    s2 << s.shares[2]
@@ -65,3 +79,7 @@
    secretsharing@alech.de
    http://www.alech.de
    @alech on Twitter
+
+== Contributors
+   Glenn Rempe (glenn@rempe.us)
+
