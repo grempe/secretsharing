@@ -20,23 +20,15 @@ module SecretSharing
     # Create a new share from a string format representation. For
     # a discussion of the format, see the to_s() method.
     def self.from_string(string)
-      version = string[0,1]
+      x                = string[1,2].hex
+      prime_bitlength  = 4 * string[-2,2].hex + 1
+      p_x_str          = string[3, string.length - 9]
+      checksum         = string[-6, 4]
 
-      raise "invalid share format version #{version}." if version != '0'
+      self.validate_share_format(string)
+      self.validate_checksum(checksum, p_x_str)
 
-      x = string[1,2].hex
-      prime_bitlength = 4 * string[-2,2].hex + 1
-      p_x_str = string[3, string.length - 9]
-      checksum = string[-6, 4]
-      computed_checksum = Digest::SHA1.hexdigest(p_x_str)[0,4].upcase
-
-      if checksum != computed_checksum
-        raise "invalid checksum. expected #{checksum}, " + \
-              "got #{computed_checksum}"
-      end
-
-      prime = SecretSharing::Shamir. \
-              smallest_prime_of_bitlength(prime_bitlength)
+      prime = SecretSharing::Shamir.smallest_prime_of_bitlength(prime_bitlength)
 
       self.new(x, OpenSSL::BN.new(p_x_str, 16), prime, prime_bitlength)
     end
@@ -69,6 +61,20 @@ module SecretSharing
     # Shares are equal if their string representation is the same.
     def ==(share)
       share.to_s == self.to_s
+    end
+
+    # FIXME : should not be a Class method.
+    def self.validate_share_format(share_string)
+      version = share_string[0,1]
+      raise "Invalid share format version # '#{version}', expected '0'" if version != '0'
+    end
+
+    # FIXME : should not be a Class method.
+    def self.validate_checksum(checksum, p_x_str)
+      computed_checksum = Digest::SHA1.hexdigest(p_x_str)[0,4].upcase
+      if checksum != computed_checksum
+        raise "Invalid checksum. Expected #{computed_checksum}, got #{checksum}"
+      end
     end
 
   end # class

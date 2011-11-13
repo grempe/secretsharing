@@ -27,5 +27,11 @@ XEOF
   s.test_files    = `git ls-files -- {test,spec,features}/*`.split("\n")
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
+
+  s.add_development_dependency 'simplecov'
+  s.add_development_dependency 'ZenTest'
+  s.add_development_dependency 'autotest-growl'
+  s.add_development_dependency 'autotest-fsevent'
+
 end
 

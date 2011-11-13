@@ -1,4 +1,10 @@
 # -*- encoding: utf-8 -*-
+
+# must be the first code included or coverage tests won't work.
+require 'simplecov'
+SimpleCov.start
+SimpleCov.add_filter "/test/"
+
 require 'test/unit'
 
 # Allow 'require_relative' to work in Ruby 1.8.x and 1.9.x (where
@@ -37,7 +43,7 @@ class TestShamir < Test::Unit::TestCase
 
   def test_create_random_secret
     s = SecretSharing::Shamir.new(5)
-    s.create_random_secret()
+    s.create_random_secret
     assert(s.secret_set?)
     assert_not_nil(s.secret)
     assert_not_nil(s.shares)
@@ -47,7 +53,7 @@ class TestShamir < Test::Unit::TestCase
     assert_equal(DEFAULT_SECRET_BITLENGTH, s.secret_bitlength)
 
     # can only be called once
-    assert_raise( RuntimeError) { s.create_random_secret() }
+    assert_raise( RuntimeError) { s.create_random_secret }
 
     s2 = SecretSharing::Shamir.new(7)
     s2.create_random_secret(512)
@@ -81,9 +87,25 @@ class TestShamir < Test::Unit::TestCase
     assert_equal(64, s2.secret_bitlength)
   end
 
+  def test_get_secret_password
+    s = SecretSharing::Shamir.new(5)
+    s.set_fixed_secret(OpenSSL::BN.new('12345678901234567890'))
+    assert(s.secret_set?)
+    assert_not_nil(s.secret_password)
+  end
+
+  def test_recover_secret_with_improper_share
+    s = SecretSharing::Shamir.new(5)
+    assert(!s.secret_set?)
+    assert_nil(s.secret)
+    # adding other than Shamir::Share or String as share raises an error
+    # Passing in an Integer for example, should fail.
+    assert_raise( ArgumentError ) { s << "1".to_i }
+  end
+
   def test_recover_secret_k_eq_n
     s = SecretSharing::Shamir.new(5)
-    s.create_random_secret()
+    s.create_random_secret
 
     s2 = SecretSharing::Shamir.new(5)
     s2 << s.shares[0]
@@ -129,7 +151,7 @@ class TestShamir < Test::Unit::TestCase
 
   def test_recover_secret_k_eq_n_strings
     s = SecretSharing::Shamir.new(2)
-    s.create_random_secret()
+    s.create_random_secret
 
     s2 = SecretSharing::Shamir.new(2)
     s2 << s.shares[0].to_s
@@ -140,7 +162,7 @@ class TestShamir < Test::Unit::TestCase
 
   def test_recover_secret_k_le_n
     s = SecretSharing::Shamir.new(5, 3)
-    s.create_random_secret()
+    s.create_random_secret
 
     s2 = SecretSharing::Shamir.new(5, 3)
     s2 << s.shares[0]
@@ -159,7 +181,7 @@ class TestShamir < Test::Unit::TestCase
 
   def test_recover_secret_k_le_n_strings
     s = SecretSharing::Shamir.new(5, 3)
-    s.create_random_secret()
+    s.create_random_secret
 
     s2 = SecretSharing::Shamir.new(5, 3)
     s2 << "#{s.shares[0]}"

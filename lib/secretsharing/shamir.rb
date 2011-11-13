@@ -102,8 +102,7 @@ module SecretSharing
         if share.class == String
           share = SecretSharing::Shamir::Share.from_string(share)
         else
-          raise ArgumentError 'SecretSharing::Shamir::Share ' \
-                            + 'or String needed'
+          raise ArgumentError, 'Expected SecretSharing::Shamir::Share or String'
         end
       end
 
