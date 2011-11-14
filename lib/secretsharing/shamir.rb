@@ -100,7 +100,7 @@ module SecretSharing
       # convert from string if needed
       if share.class != SecretSharing::Shamir::Share
         if share.class == String
-          share = SecretSharing::Shamir::Share.from_string(share)
+          share = SecretSharing::Shamir::Share.new(share)
         else
           raise ArgumentError, 'Expected SecretSharing::Shamir::Share or String'
         end
