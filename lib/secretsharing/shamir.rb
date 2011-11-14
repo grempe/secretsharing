@@ -76,8 +76,8 @@ module SecretSharing
     def set_fixed_secret(secret)
       raise 'secret already set' if secret_set?
 
-      # Create OpenSSL bignum
-      secret = OpenSSL::BN.new(secret) if secret.class != OpenSSL::BN
+      # Create OpenSSL BigNum
+      secret = OpenSSL::BN.new(secret) unless secret.is_a?(OpenSSL::BN)
 
       raise 'max bitlength is 1024' if secret.num_bits > 1024
       @secret = secret
@@ -97,9 +97,8 @@ module SecretSharing
     # Returns true if enough shares have been added to recover the secret,
     # false otherweise.
     def <<(share)
-      # convert from string if needed
-      if share.class != SecretSharing::Shamir::Share
-        if share.class == String
+      unless share.is_a?(SecretSharing::Shamir::Share)
+        if share.is_a?(String)
           share = SecretSharing::Shamir::Share.new(share)
         else
           raise ArgumentError, 'Expected SecretSharing::Shamir::Share or String'
@@ -223,7 +222,7 @@ module SecretSharing
         end.inject { |p, f| p.mod_mul(f, shares[0].prime) })
       end
 
-  end # class
+  end
 
-end # module
+end
 
