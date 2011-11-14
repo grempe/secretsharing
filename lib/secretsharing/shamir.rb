@@ -41,7 +41,7 @@ module SecretSharing
     # or
     #   s = SecretSharing::Shamir.new(3)
     # for 3 out of 3 secret sharing.
-    def initialize(n, k=n)
+    def initialize(n, k = n)
       raise ArgumentError, 'k must be <= n'  if k > n
       raise ArgumentError, 'k must be >= 2'  if k < 2
       raise ArgumentError, 'n must be < 256' if n > 255
@@ -62,7 +62,7 @@ module SecretSharing
     # secret and stores it in the 'secret' attribute.
     def create_random_secret(bitlength = DEFAULT_SECRET_BITLENGTH)
       raise 'secret already set'    if secret_set?
-      raise 'max bitlength is 1024' if bitlength > 1024
+      raise ArgumentError, 'max bitlength is 1024' if bitlength > 1024
 
       @secret = get_random_number(bitlength)
       @secret_bitlength = bitlength
