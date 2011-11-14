@@ -61,7 +61,7 @@ module SecretSharing
     # Create a random secret of a certain bitlength. Returns the
     # secret and stores it in the 'secret' attribute.
     def create_random_secret(bitlength = DEFAULT_SECRET_BITLENGTH)
-      raise 'secret already set'    if secret_set?
+      raise 'a random secret has already been set' if secret_set?
       raise ArgumentError, 'max bitlength is 1024' if bitlength > 1024
 
       @secret = get_random_number(bitlength)
