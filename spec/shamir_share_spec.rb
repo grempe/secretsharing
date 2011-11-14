@@ -33,8 +33,8 @@ describe SecretSharing::Shamir::Share do
     it "will raise when an otherwise valid String is provided with the CHECKSUM part of the string changed modified" do
       @s = SecretSharing::Shamir::Share.from_string("0016C984F871AA524431793D2F0BB86319D870BEAF3FE106CEAF262E826DCB3FD1A0B81341")
       @s.must_be_kind_of(SecretSharing::Shamir::Share)
-      skip("Which part of the string needs to change?")
-      lambda{ @s = SecretSharing::Shamir::Share.from_string("0016C984F871AA524431793D2F0BB86319D870BEAF3FE106CEAF262E826DCB3FD1A0B81341") }.must_raise(RuntimeError)
+      # changed A0B8 to A1B8
+      lambda{ @s = SecretSharing::Shamir::Share.from_string("0016C984F871AA524431793D2F0BB86319D870BEAF3FE106CEAF262E826DCB3FD1A1B81341") }.must_raise(RuntimeError)
     end
 
     it "will be instantiated from a to_s String provided to the Share#from_string method" do
