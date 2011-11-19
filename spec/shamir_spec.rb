@@ -146,6 +146,29 @@ describe SecretSharing::Shamir do
       lambda{ @s.set_fixed_secret(@bn) }.must_raise(RuntimeError)
     end
 
+    it "should allow fixed secret to be set with num_bits == 1" do
+      @s = SecretSharing::Shamir.new(@num_shares)
+      bn = OpenSSL::BN.new("1") # => 1 num_bits
+      bn.num_bits.must_equal(1)
+      @s.set_fixed_secret(bn)
+      @s.secret_bitlength.must_equal(1)
+    end
+
+    it "should allow fixed secret to be set with num_bits == 1024" do
+      @s = SecretSharing::Shamir.new(@num_shares)
+      bn = OpenSSL::BN.new("#{'1234567890' * 30 + '123456789'}") # => 1024 num_bits
+      bn.num_bits.must_equal(1024)
+      @s.set_fixed_secret(bn)
+      @s.secret_bitlength.must_equal(1024)
+    end
+
+    it "should not allow fixed secret to be set with num_bits > 1024" do
+      @s = SecretSharing::Shamir.new(@num_shares)
+      bn = OpenSSL::BN.new("#{'1234567890'*31}") # => 1027 num_bits
+      bn.num_bits.must_equal(1027)
+      lambda{ @s.set_fixed_secret(bn) }.must_raise(RuntimeError)
+    end
+
     it "should return true when #secret_set? is called" do
       @s.secret_set?.must_equal(true)
     end
@@ -193,6 +216,29 @@ describe SecretSharing::Shamir do
 
     it "should not allow fixed secret to be set twice" do
       lambda{ @s.set_fixed_secret(@bn) }.must_raise(RuntimeError)
+    end
+
+    it "should allow fixed secret to be set with num_bits == 1" do
+      @s = SecretSharing::Shamir.new(@num_shares)
+      bn = OpenSSL::BN.new("1") # => 1 num_bits
+      bn.num_bits.must_equal(1)
+      @s.set_fixed_secret(bn.to_s)
+      @s.secret_bitlength.must_equal(1)
+    end
+
+    it "should allow fixed secret to be set with num_bits == 1024" do
+      @s = SecretSharing::Shamir.new(@num_shares)
+      bn = OpenSSL::BN.new("#{'1234567890' * 30 + '123456789'}") # => 1024 num_bits
+      bn.num_bits.must_equal(1024)
+      @s.set_fixed_secret(bn.to_s)
+      @s.secret_bitlength.must_equal(1024)
+    end
+
+    it "should not allow fixed secret to be set with num_bits > 1024" do
+      @s = SecretSharing::Shamir.new(@num_shares)
+      bn = OpenSSL::BN.new("#{'1234567890'*31}") # => 1027 num_bits
+      bn.num_bits.must_equal(1027)
+      lambda{ @s.set_fixed_secret(bn.to_s) }.must_raise(RuntimeError)
     end
 
     it "should return true when #secret_set? is called" do
