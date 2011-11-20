@@ -62,7 +62,7 @@ module SecretSharing
     # secret and stores it in the 'secret' attribute.
     def create_random_secret(bitlength = DEFAULT_SECRET_BITLENGTH)
       raise 'a random secret has already been set' if secret_set?
-      raise ArgumentError, 'max bitlength is 1024' if bitlength > 1024
+      raise ArgumentError, 'max bitlength is 4096' if bitlength > 4096
 
       @secret = get_random_number(bitlength)
       @secret_bitlength = bitlength
@@ -79,7 +79,7 @@ module SecretSharing
       # Create OpenSSL BigNum
       secret = OpenSSL::BN.new(secret) unless secret.is_a?(OpenSSL::BN)
 
-      raise 'max bitlength is 1024' if secret.num_bits > 1024
+      raise 'max bitlength is 4096' if secret.num_bits > 4096
       @secret = secret
       @secret_bitlength = secret.num_bits
       create_shares
@@ -142,7 +142,9 @@ module SecretSharing
         byte_length = (bitlength / 8.0).ceil
         rand_hex = OpenSSL::Random.random_bytes(byte_length).each_byte. \
                                  to_a.map { |a| "%02x" % a }.join('')
+
         rand = OpenSSL::BN.new(rand_hex, 16)
+
         begin
           rand.mask_bits!(bitlength)
         rescue OpenSSL::BNError
@@ -150,9 +152,7 @@ module SecretSharing
           # rand was already smaller than 2^bitlength - 1
         end
 
-        if highest_bit_one
-          rand.set_bit!(bitlength)
-        end
+        rand.set_bit!(bitlength) if highest_bit_one
         rand
       end
 

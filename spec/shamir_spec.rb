@@ -121,9 +121,9 @@ describe SecretSharing::Shamir do
       @s.secret_bitlength.must_equal(1024)
     end
 
-    it "must raise an exception if passed a bit length greater than 1024" do
+    it "must raise an exception if passed a bit length greater than 4096" do
       @s = SecretSharing::Shamir.new(5)
-      lambda{ @s.create_random_secret(1025)}.must_raise(ArgumentError)
+      lambda{ @s.create_random_secret(4097)}.must_raise(ArgumentError)
     end
 
     it "must raise an exception if passed a non-integer arg" do
@@ -162,10 +162,10 @@ describe SecretSharing::Shamir do
       @s.secret_bitlength.must_equal(1024)
     end
 
-    it "should not allow fixed secret to be set with num_bits > 1024" do
+    it "should not allow fixed secret to be set with num_bits > 4097" do
       @s = SecretSharing::Shamir.new(@num_shares)
-      bn = OpenSSL::BN.new("#{'1234567890'*31}") # => 1027 num_bits
-      bn.num_bits.must_equal(1027)
+      bn = OpenSSL::BN.new("#{'1234567890' * 131}") # => 4349 num_bits
+      bn.num_bits.must_equal(4349)
       lambda{ @s.set_fixed_secret(bn) }.must_raise(RuntimeError)
     end
 
@@ -234,10 +234,10 @@ describe SecretSharing::Shamir do
       @s.secret_bitlength.must_equal(1024)
     end
 
-    it "should not allow fixed secret to be set with num_bits > 1024" do
+    it "should not allow fixed secret to be set with num_bits > 4096" do
       @s = SecretSharing::Shamir.new(@num_shares)
-      bn = OpenSSL::BN.new("#{'1234567890'*31}") # => 1027 num_bits
-      bn.num_bits.must_equal(1027)
+      bn = OpenSSL::BN.new("#{'1234567890' * 131}") # => 4349 num_bits
+      bn.num_bits.must_equal(4349)
       lambda{ @s.set_fixed_secret(bn.to_s) }.must_raise(RuntimeError)
     end
 
