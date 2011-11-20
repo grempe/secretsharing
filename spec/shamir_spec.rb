@@ -9,7 +9,7 @@ describe SecretSharing::Shamir do
       lambda { SecretSharing::Shamir.new }.must_raise(ArgumentError)
     end
 
-    it "will create shares with n and k equal which given one Integer arg" do
+    it "will create shares with n and k equal when given one Integer arg" do
       s1 = SecretSharing::Shamir.new(5)
       s1.n.must_equal(5)
       s1.k.must_equal(5)
@@ -17,6 +17,22 @@ describe SecretSharing::Shamir do
 
     it "will create shares with n and k set to their own values when given two Integer args" do
       s1 = SecretSharing::Shamir.new(5, 3)
+      s1.n.must_equal(5)
+      s1.k.must_equal(3)
+    end
+
+    it "will create shares with n and k equal when given one Integer as String arg" do
+      s1 = SecretSharing::Shamir.new("5")
+      s1.n.must_equal(5)
+      s1.k.must_equal(5)
+    end
+
+    it "will raise an exception with n being a non-Integer String arg" do
+      lambda{s1 = SecretSharing::Shamir.new("foo")}.must_raise(ArgumentError)
+    end
+
+    it "will create shares with n and k set to their own values when given two Integer as String args" do
+      s1 = SecretSharing::Shamir.new("5", "3")
       s1.n.must_equal(5)
       s1.k.must_equal(3)
     end

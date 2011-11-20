@@ -53,12 +53,17 @@ module SecretSharing
     #   s = SecretSharing::Shamir.new(3)
     #
     def initialize(n, k = n)
-      raise ArgumentError, "k must be <= n"              unless k <= n
-      raise ArgumentError, "k must be >= #{MIN_SHARES}"  unless k >= MIN_SHARES
-      raise ArgumentError, "n must be <= #{MAX_SHARES}"  unless n <= MAX_SHARES
 
-      @n               = n
-      @k               = k
+      @n               = n.to_i
+      @k               = k.to_i
+
+      raise ArgumentError, "n must be an Integer" unless @n.is_a?(Integer)
+      raise ArgumentError, "k must be an Integer" unless @k.is_a?(Integer)
+
+      raise ArgumentError, "k must be <= n"              unless @k <= @n
+      raise ArgumentError, "k must be >= #{MIN_SHARES}"  unless @k >= MIN_SHARES
+      raise ArgumentError, "n must be <= #{MAX_SHARES}"  unless @n <= MAX_SHARES
+
       @secret          = nil
       @shares          = []
       @received_shares = []
