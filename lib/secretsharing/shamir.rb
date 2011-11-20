@@ -30,6 +30,7 @@ module SecretSharing
     attr_reader :n, :k, :secret, :secret_bitlength, :shares
 
     DEFAULT_SECRET_BITLENGTH = 256
+    MAX_SECRET_BITLENGTH     = 4096
 
     # To create a new SecretSharing::Shamir object, you can
     # pass either just n, or k and n.
@@ -61,8 +62,8 @@ module SecretSharing
     # Create a random secret of a certain bitlength. Returns the
     # secret and stores it in the 'secret' attribute.
     def create_random_secret(bitlength = DEFAULT_SECRET_BITLENGTH)
-      raise 'a random secret has already been set' if secret_set?
-      raise ArgumentError, 'max bitlength is 4096' if bitlength > 4096
+      raise 'a secret has already been set' if secret_set?
+      raise ArgumentError, "max bitlength is #{MAX_SECRET_BITLENGTH}" if bitlength > MAX_SECRET_BITLENGTH
 
       @secret = get_random_number(bitlength)
       @secret_bitlength = bitlength
@@ -74,12 +75,11 @@ module SecretSharing
     # in the 'secret' attribute, creates the corresponding shares and
     # returns the secret
     def set_fixed_secret(secret)
-      raise 'secret already set' if secret_set?
+      raise 'a secret has already been set' if secret_set?
 
-      # Create OpenSSL BigNum
       secret = OpenSSL::BN.new(secret) unless secret.is_a?(OpenSSL::BN)
+      raise "the bitlength of the fixed secret provided is #{secret.num_bits}, the max bitlength allowed is #{MAX_SECRET_BITLENGTH}" if secret.num_bits > MAX_SECRET_BITLENGTH
 
-      raise 'max bitlength is 4096' if secret.num_bits > 4096
       @secret = secret
       @secret_bitlength = secret.num_bits
       create_shares
