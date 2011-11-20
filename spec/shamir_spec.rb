@@ -53,14 +53,14 @@ describe SecretSharing::Shamir do
       lambda { SecretSharing::Shamir.new(1, 1) }.must_raise(ArgumentError)
     end
 
-    it "will initialize if both k and n are at max size of 255" do
-      s1 = SecretSharing::Shamir.new(255, 255)
-      s1.n.must_equal(255)
-      s1.k.must_equal(255)
+    it "will initialize if both k and n are at max size of 512" do
+      s1 = SecretSharing::Shamir.new(512, 512)
+      s1.n.must_equal(512)
+      s1.k.must_equal(512)
     end
 
-    it "will raise if n > 255" do
-      lambda { SecretSharing::Shamir.new(256, 256) }.must_raise(ArgumentError)
+    it "will raise if n > 512" do
+      lambda { SecretSharing::Shamir.new(513) }.must_raise(ArgumentError)
     end
 
   end # describe initialization
@@ -99,8 +99,24 @@ describe SecretSharing::Shamir do
       end
     end
 
+    it "must return the correct min secret bitlength constant value" do
+      SecretSharing::Shamir::MIN_SECRET_BITLENGTH.must_equal(1)
+    end
+
     it "must return the correct default secret bitlength constant value" do
       SecretSharing::Shamir::DEFAULT_SECRET_BITLENGTH.must_equal(256)
+    end
+
+    it "must return the correct max secret bitlength constant value" do
+      SecretSharing::Shamir::MAX_SECRET_BITLENGTH.must_equal(4096)
+    end
+
+    it "must return the correct min shares constant value" do
+      SecretSharing::Shamir::MIN_SHARES.must_equal(2)
+    end
+
+    it "must return the correct max shares constant value" do
+      SecretSharing::Shamir::MAX_SHARES.must_equal(512)
     end
 
     it "must return the correct secret_bitlength when initialized with the defaults" do
@@ -160,6 +176,13 @@ describe SecretSharing::Shamir do
       bn.num_bits.must_equal(1024)
       @s.set_fixed_secret(bn)
       @s.secret_bitlength.must_equal(1024)
+    end
+
+    it "should not allow fixed secret to be set with num_bits < 1" do
+      @s = SecretSharing::Shamir.new(@num_shares)
+      bn = OpenSSL::BN.new("0") # => o num_bits
+      bn.num_bits.must_equal(0)
+      lambda{ @s.set_fixed_secret(bn) }.must_raise(RuntimeError)
     end
 
     it "should not allow fixed secret to be set with num_bits > 4097" do
@@ -232,6 +255,13 @@ describe SecretSharing::Shamir do
       bn.num_bits.must_equal(1024)
       @s.set_fixed_secret(bn.to_s)
       @s.secret_bitlength.must_equal(1024)
+    end
+
+    it "should not allow fixed secret to be set with num_bits < 1" do
+      @s = SecretSharing::Shamir.new(@num_shares)
+      bn = OpenSSL::BN.new("0") # => o num_bits
+      bn.num_bits.must_equal(0)
+      lambda{ @s.set_fixed_secret(bn.to_s) }.must_raise(RuntimeError)
     end
 
     it "should not allow fixed secret to be set with num_bits > 4096" do
