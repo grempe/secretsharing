@@ -25,6 +25,7 @@ module SecretSharing
   # add the necessary shares to it using the '<<' method. Once enough
   # shares have been added, the secret can be recovered in the secret
   # attribute.
+  #
   class Shamir
 
     attr_reader :n, :k, :secret, :secret_bitlength, :shares
@@ -33,15 +34,20 @@ module SecretSharing
     MAX_SECRET_BITLENGTH     = 4096
 
     # To create a new SecretSharing::Shamir object, you can
-    # pass either just n, or k and n.
+    # pass either just n, or n and k where:
+    #
+    #   n = The total number of shares that will be created.
+    #   k = The threshold number of the total shares needed to
+    #       recreate the original secret. (Default = n)
     #
     # For example:
-    #   s = SecretSharing::Shamir.new(5, 3)
-    # to create an object for 3 out of 5 secret sharing.
     #
-    # or
+    #   # 3(k) out of 5(n) shares needed to recover secret
+    #   s = SecretSharing::Shamir.new(5, 3)
+    #
+    #   # 3(k) out of 3(n) shares needed to recover secret
     #   s = SecretSharing::Shamir.new(3)
-    # for 3 out of 3 secret sharing.
+    #
     def initialize(n, k = n)
       raise ArgumentError, 'k must be <= n'  if k > n
       raise ArgumentError, 'k must be >= 2'  if k < 2
