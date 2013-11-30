@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 module SecretSharing
 
   # A SecretSharing::Shamir::Share object represents a share in the

@@ -1,3 +1,5 @@
+# -*- encoding: utf-8 -*-
+
 require 'openssl'
 require 'digest/sha1'
 require 'base64'
