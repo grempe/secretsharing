@@ -26,11 +26,6 @@
    # Add the following to your Gemfile
    gem "secretsharing", ">=0.3"
 
-== Installation Instructions for Development
-   bundle install
-   rake test
-   rake install
-
 == Usage
 
    require 'secretsharing'
@@ -59,6 +54,22 @@
    s2 << s.shares[2]
    s2 << s.shares[4]
    puts s2.secret
+
+== Development and Testing
+
+   # Install the gemfile dependencies
+   bundle install
+
+   # Run the test suite
+   rake test
+
+   # Run the test suite continuously
+   # upon watched file changes.
+   bundle exec rerun -x rake test
+
+   # Install the gem to your local system
+   # from the cloned repository code.
+   rake install
 
 == Copyright
    (c) 2010-2013 Alexander Klink, Glenn Rempe
