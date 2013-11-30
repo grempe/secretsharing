@@ -43,7 +43,7 @@ describe SecretSharing::Shamir do
     end
 
     it "will raise an exception with n being a non-Integer String arg" do
-      lambda{s1 = SecretSharing::Shamir.new("foo")}.must_raise(ArgumentError)
+      lambda{SecretSharing::Shamir.new("foo")}.must_raise(ArgumentError)
     end
 
     it "will create shares with n and k set to their own values when given two Integer as String args" do
@@ -355,8 +355,7 @@ describe SecretSharing::Shamir do
       end
 
       it "should raise an exception when passed a simple String that is not of the expected format" do
-        skip("Need to debug this...")
-        lambda{ @s2 << "a" }.must_raise(RuntimeError)
+        lambda{ @s2 << "a" }.must_raise(ArgumentError)
       end
 
     end

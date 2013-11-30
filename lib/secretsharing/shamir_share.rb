@@ -36,7 +36,12 @@ module SecretSharing
         @x                = string[1,2].hex
         p_x_str           = string[3, string.length - 9]
         checksum          = string[-6, 4]
-        @y                = OpenSSL::BN.new(p_x_str, 16)
+
+        begin
+          @y              = OpenSSL::BN.new(p_x_str, 16)
+        rescue Exception => e
+          raise ArgumentError, "Could not initialize OpenSSL::BN with '#{p_x_str}' : #{e.class} : #{e.message}"
+        end
 
         validate_share_format(string)
         validate_checksum(checksum, p_x_str)
