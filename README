@@ -1,5 +1,5 @@
 == Description
-   A libary for sharing secrets in an information-theoretically secure way.
+   A library for sharing secrets in an information-theoretically secure way.
    It uses Shamir's secret sharing to enable sharing a (random) secret between
    n persons where k <= n persons are enough to recover the secret. k-1 secret
    share holders learn nothing about the secret when they combine their shares.
