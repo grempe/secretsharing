@@ -8,6 +8,9 @@
    in the open source PKI software OpenXPKI, which was written by Alexander Klink
    for the OpenXPKI project in 2006.
 
+   It has been further enhanced for Ruby, and a full minitest test suite added,
+   by Glenn Rempe.
+
 == Prerequisites
    This package requires Ruby 1.8.7 or later.
 
@@ -58,7 +61,7 @@
    puts s2.secret
 
 == Copyright
-   (c) 2010-2011 Alexander Klink
+   (c) 2010-2013 Alexander Klink, Glenn Rempe
 
 == License
    Licensed under the Apache License, Version 2.0 (the "License");
@@ -74,12 +77,14 @@
    See the License for the specific language governing permissions and
    limitations under the License.
 
-== Author
+== Authors
+
    Alexander Klink
    secretsharing@alech.de
    http://www.alech.de
    @alech on Twitter
 
-== Contributors
-   Glenn Rempe (glenn@rempe.us)
-
+   Glenn Rempe
+   glenn@rempe.us
+   http://www.rempe.us
+   @grempe on Twitter
