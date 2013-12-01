@@ -37,6 +37,7 @@ XEOF
   s.add_development_dependency 'coco'
   s.add_development_dependency 'rb-fsevent'
   s.add_development_dependency 'rerun'
+  s.add_development_dependency 'rubocop'
   s.add_development_dependency 'rake'
 
 end

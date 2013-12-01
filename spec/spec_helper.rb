@@ -18,11 +18,8 @@ require 'rubygems'
 require 'bundler'
 Bundler.setup
 
-begin
-  require 'coco'
-rescue LoadError
-  # can't be loaded
-end
+# code coverage
+require 'coco'
 
-require File.expand_path("../../lib/secretsharing", __FILE__)
+require File.expand_path('../../lib/secretsharing', __FILE__)
 require 'minitest/autorun'
