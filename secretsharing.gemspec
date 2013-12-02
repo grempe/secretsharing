@@ -20,7 +20,7 @@ share holders learn nothing about the secret when they combine their shares.
 XEOF
 
   s.has_rdoc    = 'true'
-  s.extra_rdoc_files = ['README']
+  s.extra_rdoc_files = ['README.md']
 
   s.rubyforge_project = "secretsharing"
 
@@ -34,7 +34,7 @@ XEOF
   s.add_development_dependency 'netrand'
 
   s.add_development_dependency 'minitest'
-  s.add_development_dependency 'coco'
+  s.add_development_dependency 'coco' if RUBY_PLATFORM == 'java'
   s.add_development_dependency 'rb-fsevent'
   s.add_development_dependency 'rerun'
   s.add_development_dependency 'rubocop'
