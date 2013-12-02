@@ -15,5 +15,5 @@
 # limitations under the License.
 
 require 'secretsharing/version'
-require 'secretsharing/shamir'
-require 'secretsharing/shamir_share'
+require 'secretsharing/shamir/container'
+require 'secretsharing/shamir/share'

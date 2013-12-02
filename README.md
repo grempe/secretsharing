@@ -47,29 +47,29 @@ build status is (click for details):
     require 'secretsharing'
 
     # create an object for 3 out of 5 secret sharing
-    s = SecretSharing::Shamir.new(5,3)
+    c1 = SecretSharing::Shamir::Container.new(5,3)
 
     # create a random secret (returns the secret)
-    s.create_random_secret
+    c1.create_random_secret
 
     # show secret
-    puts s.secret
+    puts c1.secret
 
     # show password representation of secret (Base64)
-    puts s.secret_password
+    puts c1.secret_password
 
     # show shares
-    s.shares.each { |share| puts share }
+    c1.shares.each { |share| puts share }
 
     # recover secret from shares
-    s2 = SecretSharing::Shamir.new(3)
+    c2 = SecretSharing::Shamir::Container.new(3)
 
     # Accepts SecretSharing::Shamir::Share objects or
     # string representations thereof
-    s2 << s.shares[0]
-    s2 << s.shares[2]
-    s2 << s.shares[4]
-    puts s2.secret
+    c2 << c1.shares[0]
+    c2 << c1.shares[2]
+    c2 << c1.shares[4]
+    puts c2.secret
 
 ## Development and Testing
 

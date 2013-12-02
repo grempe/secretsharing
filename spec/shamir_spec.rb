@@ -16,82 +16,82 @@
 
 require File.expand_path('../spec_helper', __FILE__)
 
-describe SecretSharing::Shamir do
+describe SecretSharing::Shamir::Container do
 
   describe 'initialization' do
 
     it 'will raise when instantiated with no args' do
-      lambda { SecretSharing::Shamir.new }.must_raise(ArgumentError)
+      lambda { SecretSharing::Shamir::Container.new }.must_raise(ArgumentError)
     end
 
     it 'will create shares with n and k equal when given one Integer arg' do
-      s1 = SecretSharing::Shamir.new(5)
+      s1 = SecretSharing::Shamir::Container.new(5)
       s1.n.must_equal(5)
       s1.k.must_equal(5)
     end
 
     it 'will create shares with n and k set to their own values when given two Integer args' do
-      s1 = SecretSharing::Shamir.new(5, 3)
+      s1 = SecretSharing::Shamir::Container.new(5, 3)
       s1.n.must_equal(5)
       s1.k.must_equal(3)
     end
 
     it 'will create shares with n and k equal when given one Integer as String arg' do
-      s1 = SecretSharing::Shamir.new('5')
+      s1 = SecretSharing::Shamir::Container.new('5')
       s1.n.must_equal(5)
       s1.k.must_equal(5)
     end
 
     it 'will raise an exception with n being a non-Integer String arg' do
-      lambda { SecretSharing::Shamir.new('foo') }.must_raise(ArgumentError)
+      lambda { SecretSharing::Shamir::Container.new('foo') }.must_raise(ArgumentError)
     end
 
     it 'will create shares with n and k set to their own values when given two Integer as String args' do
-      s1 = SecretSharing::Shamir.new('5', '3')
+      s1 = SecretSharing::Shamir::Container.new('5', '3')
       s1.n.must_equal(5)
       s1.k.must_equal(3)
     end
 
     it 'will return false when secret_set? is called after initialization with only n arg set' do
-      s1 = SecretSharing::Shamir.new(5)
+      s1 = SecretSharing::Shamir::Container.new(5)
       s1.secret_set?.must_equal(false)
     end
 
     it 'will return false when secret_set? is called after initialization with n and k arg set' do
-      s1 = SecretSharing::Shamir.new(5, 3)
+      s1 = SecretSharing::Shamir::Container.new(5, 3)
       s1.secret_set?.must_equal(false)
     end
 
     it 'will return nil secret when called after initialization with only n arg set' do
-      s1 = SecretSharing::Shamir.new(5)
+      s1 = SecretSharing::Shamir::Container.new(5)
       s1.secret.must_be_nil
     end
 
     it 'will return nil secret when called after initialization with n and k arg set' do
-      s1 = SecretSharing::Shamir.new(5, 3)
+      s1 = SecretSharing::Shamir::Container.new(5, 3)
       s1.secret.must_be_nil
     end
 
     it 'will raise if k > n' do
-      lambda { SecretSharing::Shamir.new(5, 6) }.must_raise(ArgumentError)
+      lambda { SecretSharing::Shamir::Container.new(5, 6) }.must_raise(ArgumentError)
     end
 
     it 'will raise if only n is provided and it is < 2' do
-      lambda { SecretSharing::Shamir.new(1) }.must_raise(ArgumentError)
+      lambda { SecretSharing::Shamir::Container.new(1) }.must_raise(ArgumentError)
     end
 
     it 'will raise unless k >= 2' do
-      lambda { SecretSharing::Shamir.new(1, 1) }.must_raise(ArgumentError)
+      lambda { SecretSharing::Shamir::Container.new(1, 1) }.must_raise(ArgumentError)
     end
 
     it 'will initialize if both k and n are at max size of 512' do
-      s1 = SecretSharing::Shamir.new(512, 512)
+      s1 = SecretSharing::Shamir::Container.new(512, 512)
       s1.n.must_equal(512)
       s1.k.must_equal(512)
     end
 
     it 'will raise if n > 512' do
-      lambda { SecretSharing::Shamir.new(513) }.must_raise(ArgumentError)
+      lambda { SecretSharing::Shamir::Container.new(513) }.must_raise(ArgumentError)
     end
 
   end # describe initialization
@@ -100,7 +100,7 @@ describe SecretSharing::Shamir do
 
     before do
       @num_shares = 5
-      @s = SecretSharing::Shamir.new(@num_shares)
+      @s = SecretSharing::Shamir::Container.new(@num_shares)
       @s.create_random_secret
     end
 
@@ -131,27 +131,27 @@ describe SecretSharing::Shamir do
     end
 
     it 'must return the correct min secret bitlength constant value' do
-      SecretSharing::Shamir::MIN_SECRET_BITLENGTH.must_equal(1)
+      SecretSharing::Shamir::Container::MIN_SECRET_BITLENGTH.must_equal(1)
     end
 
     it 'must return the correct default secret bitlength constant value' do
-      SecretSharing::Shamir::DEFAULT_SECRET_BITLENGTH.must_equal(256)
+      SecretSharing::Shamir::Container::DEFAULT_SECRET_BITLENGTH.must_equal(256)
     end
 
     it 'must return the correct max secret bitlength constant value' do
-      SecretSharing::Shamir::MAX_SECRET_BITLENGTH.must_equal(4096)
+      SecretSharing::Shamir::Container::MAX_SECRET_BITLENGTH.must_equal(4096)
     end
 
     it 'must return the correct min shares constant value' do
-      SecretSharing::Shamir::MIN_SHARES.must_equal(2)
+      SecretSharing::Shamir::Container::MIN_SHARES.must_equal(2)
     end
 
     it 'must return the correct max shares constant value' do
-      SecretSharing::Shamir::MAX_SHARES.must_equal(512)
+      SecretSharing::Shamir::Container::MAX_SHARES.must_equal(512)
     end
 
     it 'must return the correct secret_bitlength when initialized with the defaults' do
-      @s.secret_bitlength.must_equal(SecretSharing::Shamir::DEFAULT_SECRET_BITLENGTH)
+      @s.secret_bitlength.must_equal(SecretSharing::Shamir::Container::DEFAULT_SECRET_BITLENGTH)
     end
 
     it 'must raise an exception if #create_random_secret is called more than once' do
@@ -163,18 +163,18 @@ describe SecretSharing::Shamir do
   describe 'creating random secret with custom args' do
 
     it 'must set secret_bitlength to the same length the random secret was created with' do
-      @s = SecretSharing::Shamir.new(5)
+      @s = SecretSharing::Shamir::Container.new(5)
       @s.create_random_secret(1024)
       @s.secret_bitlength.must_equal(1024)
     end
 
     it 'must raise an exception if passed a bit length greater than 4096' do
-      @s = SecretSharing::Shamir.new(5)
+      @s = SecretSharing::Shamir::Container.new(5)
       lambda { @s.create_random_secret(4097) }.must_raise(ArgumentError)
     end
 
     it 'must raise an exception if passed a non-integer arg' do
-      @s = SecretSharing::Shamir.new(5)
+      @s = SecretSharing::Shamir::Container.new(5)
       lambda { @s.create_random_secret('a') }.must_raise(ArgumentError)
     end
 
@@ -185,7 +185,7 @@ describe SecretSharing::Shamir do
     before do
       @num_shares = 5
       @bn = OpenSSL::BN.new('12345678901234567890')
-      @s = SecretSharing::Shamir.new(@num_shares)
+      @s = SecretSharing::Shamir::Container.new(@num_shares)
       @s.set_fixed_secret(@bn)
     end
 
@@ -194,7 +194,7 @@ describe SecretSharing::Shamir do
     end
 
     it 'should allow fixed secret to be set with num_bits == 1' do
-      @s = SecretSharing::Shamir.new(@num_shares)
+      @s = SecretSharing::Shamir::Container.new(@num_shares)
       bn = OpenSSL::BN.new('1') # => 1 num_bits
       bn.num_bits.must_equal(1)
       @s.set_fixed_secret(bn)
@@ -202,7 +202,7 @@ describe SecretSharing::Shamir do
     end
 
     it 'should allow fixed secret to be set with num_bits == 1024' do
-      @s = SecretSharing::Shamir.new(@num_shares)
+      @s = SecretSharing::Shamir::Container.new(@num_shares)
       bn = OpenSSL::BN.new("#{'1234567890' * 30 + '123456789'}") # => 1024 num_bits
       bn.num_bits.must_equal(1024)
       @s.set_fixed_secret(bn)
@@ -210,14 +210,14 @@ describe SecretSharing::Shamir do
     end
 
     it 'should not allow fixed secret to be set with num_bits < 1' do
-      @s = SecretSharing::Shamir.new(@num_shares)
+      @s = SecretSharing::Shamir::Container.new(@num_shares)
       bn = OpenSSL::BN.new('0') # => o num_bits
       bn.num_bits.must_equal(0)
       lambda { @s.set_fixed_secret(bn) }.must_raise(RuntimeError)
     end
 
     it 'should not allow fixed secret to be set with num_bits > 4097' do
-      @s = SecretSharing::Shamir.new(@num_shares)
+      @s = SecretSharing::Shamir::Container.new(@num_shares)
       bn = OpenSSL::BN.new("#{'1234567890' * 131}") # => 4349 num_bits
       bn.num_bits.must_equal(4349)
       lambda { @s.set_fixed_secret(bn) }.must_raise(RuntimeError)
@@ -264,7 +264,7 @@ describe SecretSharing::Shamir do
     before do
       @num_shares = 5
       @bn = '12345678901234567890'
-      @s = SecretSharing::Shamir.new(@num_shares)
+      @s = SecretSharing::Shamir::Container.new(@num_shares)
       @s.set_fixed_secret(@bn)
     end
 
@@ -273,7 +273,7 @@ describe SecretSharing::Shamir do
     end
 
     it 'should allow fixed secret to be set with num_bits == 1' do
-      @s = SecretSharing::Shamir.new(@num_shares)
+      @s = SecretSharing::Shamir::Container.new(@num_shares)
       bn = OpenSSL::BN.new('1') # => 1 num_bits
       bn.num_bits.must_equal(1)
       @s.set_fixed_secret(bn.to_s)
@@ -281,7 +281,7 @@ describe SecretSharing::Shamir do
     end
 
     it 'should allow fixed secret to be set with num_bits == 1024' do
-      @s = SecretSharing::Shamir.new(@num_shares)
+      @s = SecretSharing::Shamir::Container.new(@num_shares)
       bn = OpenSSL::BN.new("#{'1234567890' * 30 + '123456789'}") # => 1024 num_bits
       bn.num_bits.must_equal(1024)
       @s.set_fixed_secret(bn.to_s)
@@ -289,14 +289,14 @@ describe SecretSharing::Shamir do
     end
 
     it 'should not allow fixed secret to be set with num_bits < 1' do
-      @s = SecretSharing::Shamir.new(@num_shares)
+      @s = SecretSharing::Shamir::Container.new(@num_shares)
       bn = OpenSSL::BN.new('0') # => o num_bits
       bn.num_bits.must_equal(0)
       lambda { @s.set_fixed_secret(bn.to_s) }.must_raise(RuntimeError)
     end
 
     it 'should not allow fixed secret to be set with num_bits > 4096' do
-      @s = SecretSharing::Shamir.new(@num_shares)
+      @s = SecretSharing::Shamir::Container.new(@num_shares)
       bn = OpenSSL::BN.new("#{'1234567890' * 131}") # => 4349 num_bits
       bn.num_bits.must_equal(4349)
       lambda { @s.set_fixed_secret(bn.to_s) }.must_raise(RuntimeError)
@@ -341,13 +341,13 @@ describe SecretSharing::Shamir do
   describe 'recovering a secret' do
 
     before do
-      @s1 = SecretSharing::Shamir.new(5)    # creator
-      @s2 = SecretSharing::Shamir.new(5)    # recipient
+      @s1 = SecretSharing::Shamir::Container.new(5)    # creator
+      @s2 = SecretSharing::Shamir::Container.new(5)    # recipient
 
-      @s3 = SecretSharing::Shamir.new(5, 3) # creator
-      @s4 = SecretSharing::Shamir.new(5, 3) # recipient
+      @s3 = SecretSharing::Shamir::Container.new(5, 3) # creator
+      @s4 = SecretSharing::Shamir::Container.new(5, 3) # recipient
 
-      @bad = SecretSharing::Shamir.new(5, 3) # a bad actor
+      @bad = SecretSharing::Shamir::Container.new(5, 3) # a bad actor
     end
 
     describe 'with invalid shares' do

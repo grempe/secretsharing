@@ -7,17 +7,10 @@ Gem::Specification.new do |s|
   s.name        = "secretsharing"
   s.version     = SecretSharing::VERSION
   s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Alexander Klink"]
-  s.email       = ["secretsharing@alec.de"]
-  s.homepage    = "http://repo.or.cz/w/secretsharing.git"
-  s.summary     = %q{A library to share secrets in an information-theoretically secure way.}
-
-  s.description =<<'XEOF'
-A libary for sharing secrets in an information-theoretically secure way.
-It uses Shamir's secret sharing to enable sharing a (random) secret between
-n persons where k <= n persons are enough to recover the secret. k-1 secret
-share holders learn nothing about the secret when they combine their shares.
-XEOF
+  s.authors     = ["Alexander Klink", "Glenn Rempe"]
+  s.email       = ["glenn@rempe.us"]
+  s.homepage    = "https://github.com/grempe/secretsharing"
+  s.summary     = %q{A Ruby Gem to enable sharing secrets using Shamirs Secret Sharing.}
 
   s.has_rdoc    = 'true'
   s.extra_rdoc_files = ['README.md']
@@ -39,5 +32,13 @@ XEOF
   s.add_development_dependency 'rerun'
   s.add_development_dependency 'rubocop'
   s.add_development_dependency 'rake'
+
+  s.description =<<'XEOF'
+Shamir's Secret Sharing is an algorithm in cryptography. It is a
+form of secret sharing, where a secret is divided into parts,
+giving each participant its own unique part, where some of the
+parts or all of them are needed in order to reconstruct the
+secret. Holders of a share gain no knowledge of the larger secret.
+XEOF
 
 end
