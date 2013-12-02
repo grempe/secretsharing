@@ -18,8 +18,6 @@ require 'openssl'
 require 'digest/sha1'
 require 'base64'
 
-# rubocop:disable LineLength
-
 module SecretSharing
   # The SecretSharing::Shamir class can be used to share random
   # secrets between n people, so that k < n people can recover the
@@ -249,5 +247,3 @@ module SecretSharing
       end
   end
 end
-
-# rubocop:enable LineLength

@@ -14,8 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# rubocop:disable LineLength
-
 module SecretSharing
   # A SecretSharing::Shamir::Share object represents a share in the
   # Shamir secret sharing scheme. The share consists of a point (x,y) on
@@ -105,5 +103,3 @@ module SecretSharing
       end
   end
 end
-
-# rubocop:enable LineLength

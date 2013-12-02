@@ -16,14 +16,12 @@
 
 require File.expand_path('../spec_helper', __FILE__)
 
-# rubocop:disable LineLength
-
 describe SecretSharing::Shamir do
 
   describe 'initialization' do
 
     it 'will raise when instantiated with no args' do
-      -> { SecretSharing::Shamir.new }.must_raise(ArgumentError)
+      lambda { SecretSharing::Shamir.new }.must_raise(ArgumentError)
     end
 
     it 'will create shares with n and k equal when given one Integer arg' do
@@ -45,7 +43,7 @@ describe SecretSharing::Shamir do
     end
 
     it 'will raise an exception with n being a non-Integer String arg' do
-      -> { SecretSharing::Shamir.new('foo') }.must_raise(ArgumentError)
+      lambda { SecretSharing::Shamir.new('foo') }.must_raise(ArgumentError)
     end
 
     it 'will create shares with n and k set to their own values when given two Integer as String args' do
@@ -75,15 +73,15 @@ describe SecretSharing::Shamir do
     end
 
     it 'will raise if k > n' do
-      -> { SecretSharing::Shamir.new(5, 6) }.must_raise(ArgumentError)
+      lambda { SecretSharing::Shamir.new(5, 6) }.must_raise(ArgumentError)
     end
 
     it 'will raise if only n is provided and it is < 2' do
-      -> { SecretSharing::Shamir.new(1) }.must_raise(ArgumentError)
+      lambda { SecretSharing::Shamir.new(1) }.must_raise(ArgumentError)
     end
 
     it 'will raise unless k >= 2' do
-      -> { SecretSharing::Shamir.new(1, 1) }.must_raise(ArgumentError)
+      lambda { SecretSharing::Shamir.new(1, 1) }.must_raise(ArgumentError)
     end
 
     it 'will initialize if both k and n are at max size of 512' do
@@ -93,7 +91,7 @@ describe SecretSharing::Shamir do
     end
 
     it 'will raise if n > 512' do
-      -> { SecretSharing::Shamir.new(513) }.must_raise(ArgumentError)
+      lambda { SecretSharing::Shamir.new(513) }.must_raise(ArgumentError)
     end
 
   end # describe initialization
@@ -157,7 +155,7 @@ describe SecretSharing::Shamir do
     end
 
     it 'must raise an exception if #create_random_secret is called more than once' do
-      -> { @s.create_random_secret }.must_raise(RuntimeError)
+      lambda { @s.create_random_secret }.must_raise(RuntimeError)
     end
 
   end # describe creating random secret
@@ -172,12 +170,12 @@ describe SecretSharing::Shamir do
 
     it 'must raise an exception if passed a bit length greater than 4096' do
       @s = SecretSharing::Shamir.new(5)
-      -> { @s.create_random_secret(4097) }.must_raise(ArgumentError)
+      lambda { @s.create_random_secret(4097) }.must_raise(ArgumentError)
     end
 
     it 'must raise an exception if passed a non-integer arg' do
       @s = SecretSharing::Shamir.new(5)
-      -> { @s.create_random_secret('a') }.must_raise(ArgumentError)
+      lambda { @s.create_random_secret('a') }.must_raise(ArgumentError)
     end
 
   end
@@ -192,7 +190,7 @@ describe SecretSharing::Shamir do
     end
 
     it 'should not allow fixed secret to be set twice' do
-      -> { @s.set_fixed_secret(@bn) }.must_raise(RuntimeError)
+      lambda { @s.set_fixed_secret(@bn) }.must_raise(RuntimeError)
     end
 
     it 'should allow fixed secret to be set with num_bits == 1' do
@@ -215,14 +213,14 @@ describe SecretSharing::Shamir do
       @s = SecretSharing::Shamir.new(@num_shares)
       bn = OpenSSL::BN.new('0') # => o num_bits
       bn.num_bits.must_equal(0)
-      -> { @s.set_fixed_secret(bn) }.must_raise(RuntimeError)
+      lambda { @s.set_fixed_secret(bn) }.must_raise(RuntimeError)
     end
 
     it 'should not allow fixed secret to be set with num_bits > 4097' do
       @s = SecretSharing::Shamir.new(@num_shares)
       bn = OpenSSL::BN.new("#{'1234567890' * 131}") # => 4349 num_bits
       bn.num_bits.must_equal(4349)
-      -> { @s.set_fixed_secret(bn) }.must_raise(RuntimeError)
+      lambda { @s.set_fixed_secret(bn) }.must_raise(RuntimeError)
     end
 
     it 'should return true when #secret_set? is called' do
@@ -271,7 +269,7 @@ describe SecretSharing::Shamir do
     end
 
     it 'should not allow fixed secret to be set twice' do
-      -> { @s.set_fixed_secret(@bn) }.must_raise(RuntimeError)
+      lambda { @s.set_fixed_secret(@bn) }.must_raise(RuntimeError)
     end
 
     it 'should allow fixed secret to be set with num_bits == 1' do
@@ -294,14 +292,14 @@ describe SecretSharing::Shamir do
       @s = SecretSharing::Shamir.new(@num_shares)
       bn = OpenSSL::BN.new('0') # => o num_bits
       bn.num_bits.must_equal(0)
-      -> { @s.set_fixed_secret(bn.to_s) }.must_raise(RuntimeError)
+      lambda { @s.set_fixed_secret(bn.to_s) }.must_raise(RuntimeError)
     end
 
     it 'should not allow fixed secret to be set with num_bits > 4096' do
       @s = SecretSharing::Shamir.new(@num_shares)
       bn = OpenSSL::BN.new("#{'1234567890' * 131}") # => 4349 num_bits
       bn.num_bits.must_equal(4349)
-      -> { @s.set_fixed_secret(bn.to_s) }.must_raise(RuntimeError)
+      lambda { @s.set_fixed_secret(bn.to_s) }.must_raise(RuntimeError)
     end
 
     it 'should return true when #secret_set? is called' do
@@ -355,11 +353,11 @@ describe SecretSharing::Shamir do
     describe 'with invalid shares' do
 
       it 'should raise an exception when passed a simple Integer' do
-        -> { @s2 << 1 }.must_raise(ArgumentError)
+        lambda { @s2 << 1 }.must_raise(ArgumentError)
       end
 
       it 'should raise an exception when passed a simple String that is not of the expected format' do
-        -> { @s2 << 'a' }.must_raise(ArgumentError)
+        lambda { @s2 << 'a' }.must_raise(ArgumentError)
       end
 
     end
@@ -398,7 +396,7 @@ describe SecretSharing::Shamir do
         @s2 << @s1.shares[4]
         @s2.secret_set?.must_equal(true)
 
-        -> { @s2 << @bad.shares[0] }.must_raise(ArgumentError)
+        lambda { @s2 << @bad.shares[0] }.must_raise(ArgumentError)
       end
 
       it 'should not be able to recover correct secret when k equals n and k-1 valid shares and 1 invalid share are provided as Shamir::Share objects' do
@@ -584,5 +582,3 @@ describe SecretSharing::Shamir do
   end
 
 end
-
-# rubocop:enable LineLength

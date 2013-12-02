@@ -1,0 +1,17 @@
+LineLength:
+  Enabled: false
+
+Lambda:
+  Enabled: false
+
+MethodLength:
+  Max: 22
+
+ClassLength:
+  Max: 125
+
+CyclomaticComplexity:
+  Max: 10
+
+HandleExceptions:
+  Enabled: false

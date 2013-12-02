@@ -15,5 +15,5 @@
 # limitations under the License.
 
 module SecretSharing
-  VERSION = "0.3"
+  VERSION = '0.3'
 end
