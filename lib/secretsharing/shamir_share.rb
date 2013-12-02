@@ -90,12 +90,6 @@ module SecretSharing
       other.to_s == to_s
     end
 
-    # FIXME : deprecated method : remove later
-    def self.from_string(share)
-      fail 'Expected a Share String object.' unless share.is_a?(String)
-      SecretSharing::Shamir::Share.new(share)
-    end
-
     private
 
       def validate_share_format(share_string)

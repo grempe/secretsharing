@@ -43,13 +43,6 @@ describe SecretSharing::Shamir::Share do
       @s.to_s.must_equal(share)
     end
 
-    it 'will be instantiated from a valid String provided to the now deprecated Share#from_string method' do
-      share = '0016C984F871AA524431793D2F0BB86319D870BEAF3FE106CEAF262E826DCB3FD1A0B81341'
-      @s = SecretSharing::Shamir::Share.from_string(share)
-      @s.must_be_kind_of(SecretSharing::Shamir::Share)
-      @s.to_s.must_equal(share)
-    end
-
     it 'will raise when an otherwise valid String is provided with the VERSION part of the string changed from 0 to 1' do
       @s = SecretSharing::Shamir::Share.new('0016C984F871AA524431793D2F0BB86319D870BEAF3FE106CEAF262E826DCB3FD1A0B81341')
       @s.must_be_kind_of(SecretSharing::Shamir::Share)
