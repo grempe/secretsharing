@@ -12,11 +12,14 @@ Learn More:
 
 <http://en.wikipedia.org/wiki/Shamir's_Secret_Sharing>
 
-### History
+### Development History
 
 This library is based on the OpenXPKI::Crypto::Secret::Split Perl module
 used in the open source PKI software OpenXPKI, which was written by
 Alexander Klink for the OpenXPKI project in 2006.
+
+The original source code for Alexander Klink's 'secretsharing' gem
+can be found at <http://repo.or.cz/w/secretsharing.git>
 
 It has been further enhanced, modularized, and a full test suite
 has been added by Glenn Rempe (<glenn@rempe.us>) and can be found
