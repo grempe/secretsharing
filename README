@@ -20,6 +20,10 @@
 
    https://travis-ci.org/grempe/secretsharing
 
+   Current Travis CI Build Status:
+
+   [![Build Status](https://travis-ci.org/grempe/secretsharing.png)](https://travis-ci.org/grempe/secretsharing)
+
 == Installation Instructions
 
    gem install secretsharing
