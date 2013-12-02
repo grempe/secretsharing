@@ -14,11 +14,12 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'openssl'
-require 'digest/sha1'
-require 'base64'
+require File.expand_path('../spec_helper', __FILE__)
 
-require 'secretsharing/version'
-require 'secretsharing/shamir/container'
-require 'secretsharing/shamir/share'
-require 'secretsharing/shamir/secret'
+describe SecretSharing::Shamir::Secret do
+
+  describe 'initialization' do
+
+  end
+
+end

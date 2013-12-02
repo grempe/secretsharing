@@ -14,10 +14,6 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'openssl'
-require 'digest/sha1'
-require 'base64'
-
 module SecretSharing
   module Shamir
     # The SecretSharing::Shamir::Container class can be used to share random
@@ -83,19 +79,18 @@ module SecretSharing
         @received_shares = []
       end
 
-      # Check whether the secret is set.
-      def secret_set?
-        !@secret.nil?
+      def secret?
+        @secret.is_a?(SecretSharing::Shamir::Secret)
       end
 
       # Create a random secret of a certain bitlength. Returns the
       # secret and stores it in the 'secret' attribute.
       def create_random_secret(bitlength = DEFAULT_SECRET_BITLENGTH)
-        fail 'a secret has already been set' if secret_set?
+        fail 'a secret has already been set' if secret?
         fail ArgumentError, "min bitlength is #{MIN_SECRET_BITLENGTH}" if bitlength < MIN_SECRET_BITLENGTH
         fail ArgumentError, "max bitlength is #{MAX_SECRET_BITLENGTH}" if bitlength > MAX_SECRET_BITLENGTH
 
-        @secret = get_random_number(bitlength)
+        @secret = SecretSharing::Shamir::Secret.new(get_random_number(bitlength))
         @secret_bitlength = bitlength
         create_shares
         @secret
@@ -105,22 +100,16 @@ module SecretSharing
       # in the 'secret' attribute, creates the corresponding shares and
       # returns the secret
       def set_fixed_secret(secret)
-        fail 'a secret has already been set' if secret_set?
+        fail 'a secret has already been set' if secret?
 
         secret = OpenSSL::BN.new(secret) unless secret.is_a?(OpenSSL::BN)
         fail "the bitlength of the fixed secret provided is #{secret.num_bits}, the min bitlength allowed is #{MIN_SECRET_BITLENGTH}" if secret.num_bits < MIN_SECRET_BITLENGTH
         fail "the bitlength of the fixed secret provided is #{secret.num_bits}, the max bitlength allowed is #{MAX_SECRET_BITLENGTH}" if secret.num_bits > MAX_SECRET_BITLENGTH
 
-        @secret = secret
+        @secret = SecretSharing::Shamir::Secret.new(secret)
         @secret_bitlength = secret.num_bits
         create_shares
         @secret
-      end
-
-      # The secret in a password representation (Base64-encoded)
-      def secret_password
-        fail 'Secret not (yet) set.' unless secret_set?
-        Base64.encode64([@secret.to_s(16)].pack('h*')).split("\n").join
       end
 
       # Add a secret share to the object. Accepts either a
@@ -181,7 +170,7 @@ module SecretSharing
         # and then computing points on this polynomial.
         def create_shares
           @coefficients = []
-          @coefficients[0] = @secret
+          @coefficients[0] = @secret.secret
 
           # round up to next nibble
           next_nibble_bitlength = @secret_bitlength + (4 - (@secret_bitlength % 4))
@@ -217,14 +206,14 @@ module SecretSharing
         def recover_secret
           return false unless @received_shares.length >= @k
 
-          @secret = OpenSSL::BN.new('0')
+          @secret = SecretSharing::Shamir::Secret.new
 
           @received_shares.each do |share|
             l_x     = l(share.x, @received_shares)
             summand = share.y * l_x
             summand %= share.prime
-            @secret += summand
-            @secret %= share.prime
+            @secret.secret += summand
+            @secret.secret %= share.prime
           end
 
           @secret

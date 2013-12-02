@@ -4,7 +4,7 @@
 A Ruby gem for sharing secrets in an information-theoretically secure way.
 
 It uses Shamir's secret sharing to enable sharing a (random) secret
-between n persons where k <= n shares are enough to recover the secret. 
+between n persons where k <= n shares are enough to recover the secret.
 
 k-1 secret share holders learn nothing about the secret when they combine their shares.
 
@@ -56,7 +56,7 @@ build status is (click for details):
     puts c1.secret
 
     # show password representation of secret (Base64)
-    puts c1.secret_password
+    puts c1.secret.to_base64
 
     # show shares
     c1.shares.each { |share| puts share }
@@ -110,12 +110,12 @@ the License.
 
 ## Authors
 
-***Alexander Klink***  
-<secretsharing@alech.de>  
-<http://www.alech.de>  
-@alech on Twitter  
+***Alexander Klink***
+<secretsharing@alech.de>
+<http://www.alech.de>
+@alech on Twitter
 
-***Glenn Rempe***  
-<glenn@rempe.us>  
-<http://www.rempe.us>  
-@grempe on Twitter  
+***Glenn Rempe***
+<glenn@rempe.us>
+<http://www.rempe.us>
+@grempe on Twitter

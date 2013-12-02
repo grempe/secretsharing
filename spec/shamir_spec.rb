@@ -52,14 +52,14 @@ describe SecretSharing::Shamir::Container do
       s1.k.must_equal(3)
     end
 
-    it 'will return false when secret_set? is called after initialization with only n arg set' do
+    it 'will return false when secret? is called after initialization with only n arg set' do
       s1 = SecretSharing::Shamir::Container.new(5)
-      s1.secret_set?.must_equal(false)
+      s1.secret?.must_equal(false)
     end
 
-    it 'will return false when secret_set? is called after initialization with n and k arg set' do
+    it 'will return false when secret? is called after initialization with n and k arg set' do
       s1 = SecretSharing::Shamir::Container.new(5, 3)
-      s1.secret_set?.must_equal(false)
+      s1.secret?.must_equal(false)
     end
 
     it 'will return nil secret when called after initialization with only n arg set' do
@@ -104,8 +104,8 @@ describe SecretSharing::Shamir::Container do
       @s.create_random_secret
     end
 
-    it 'will return true from #secret_set?' do
-      @s.secret_set?.must_equal(true)
+    it 'will return true from #secret?' do
+      @s.secret?.must_equal(true)
     end
 
     it 'will not return a nil secret' do
@@ -223,12 +223,8 @@ describe SecretSharing::Shamir::Container do
       lambda { @s.set_fixed_secret(bn) }.must_raise(RuntimeError)
     end
 
-    it 'should return true when #secret_set? is called' do
-      @s.secret_set?.must_equal(true)
-    end
-
-    it 'should return a secret password' do
-      @s.secret_password.wont_be_nil
+    it 'should return true when #secret? is called' do
+      @s.secret?.must_equal(true)
     end
 
     it 'should not return nil when #secret is called' do
@@ -302,12 +298,8 @@ describe SecretSharing::Shamir::Container do
       lambda { @s.set_fixed_secret(bn.to_s) }.must_raise(RuntimeError)
     end
 
-    it 'should return true when #secret_set? is called' do
-      @s.secret_set?.must_equal(true)
-    end
-
-    it 'should return a secret password' do
-      @s.secret_password.wont_be_nil
+    it 'should return true when #secret? is called' do
+      @s.secret?.must_equal(true)
     end
 
     it 'should not return nil when #secret is called' do
@@ -378,12 +370,12 @@ describe SecretSharing::Shamir::Container do
         @s2 << @s1.shares[3]
 
         # with the last remaining share missing
-        @s2.secret_set?.must_equal(false)
+        @s2.secret?.must_equal(false)
 
         @s2 << @s1.shares[4]
 
         # with the final share provided
-        @s2.secret_set?.must_equal(true)
+        @s2.secret?.must_equal(true)
         @s2.secret.must_equal(@s1.secret)
       end
 
@@ -392,9 +384,9 @@ describe SecretSharing::Shamir::Container do
         @s2 << @s1.shares[1]
         @s2 << @s1.shares[2]
         @s2 << @s1.shares[3]
-        @s2.secret_set?.must_equal(false)
+        @s2.secret?.must_equal(false)
         @s2 << @s1.shares[4]
-        @s2.secret_set?.must_equal(true)
+        @s2.secret?.must_equal(true)
 
         lambda { @s2 << @bad.shares[0] }.must_raise(ArgumentError)
       end
@@ -406,12 +398,12 @@ describe SecretSharing::Shamir::Container do
         @s2 << @s1.shares[3]
 
         # with the last remaining share missing
-        @s2.secret_set?.must_equal(false)
+        @s2.secret?.must_equal(false)
 
         # with a single invalid share it will
         # recover a secret, but it will be the *wrong* secret!
         @s2 << @bad.shares[0]
-        @s2.secret_set?.must_equal(true)
+        @s2.secret?.must_equal(true)
         @s2.secret.wont_equal(@s1.secret)
       end
 
@@ -432,12 +424,12 @@ describe SecretSharing::Shamir::Container do
         @s2 << @s1.shares[3]
 
         # with the last remaining share missing
-        @s2.secret_set?.must_equal(false)
+        @s2.secret?.must_equal(false)
 
         @s2 << @s1.shares[4]
 
         # with the final share provided
-        @s2.secret_set?.must_equal(true)
+        @s2.secret?.must_equal(true)
         @s2.secret.must_equal(@s1.secret)
       end
 
@@ -448,12 +440,12 @@ describe SecretSharing::Shamir::Container do
         @s2 << @s1.shares[3].to_s
 
         # with the last remaining share missing
-        @s2.secret_set?.must_equal(false)
+        @s2.secret?.must_equal(false)
 
         @s2 << @s1.shares[4]
 
         # with the final share provided
-        @s2.secret_set?.must_equal(true)
+        @s2.secret?.must_equal(true)
         @s2.secret.must_equal(@s1.secret)
       end
 
@@ -462,12 +454,12 @@ describe SecretSharing::Shamir::Container do
         @s4 << @s3.shares[1]
 
         # with the last remaining share missing
-        @s4.secret_set?.must_equal(false)
+        @s4.secret?.must_equal(false)
 
         @s4 << @s3.shares[2]
 
         # with the final share provided
-        @s4.secret_set?.must_equal(true)
+        @s4.secret?.must_equal(true)
         @s4.secret.must_equal(@s3.secret)
       end
 
@@ -476,12 +468,12 @@ describe SecretSharing::Shamir::Container do
         @s4 << @s3.shares[1].to_s
 
         # with the last remaining share missing
-        @s4.secret_set?.must_equal(false)
+        @s4.secret?.must_equal(false)
 
         @s4 << @s3.shares[2].to_s
 
         # with the final share provided
-        @s4.secret_set?.must_equal(true)
+        @s4.secret?.must_equal(true)
         @s4.secret.must_equal(@s3.secret)
       end
 
@@ -490,17 +482,17 @@ describe SecretSharing::Shamir::Container do
         @s4 << @s3.shares[1].to_s
 
         # with the last remaining share missing
-        @s4.secret_set?.must_equal(false)
+        @s4.secret?.must_equal(false)
 
         @s4 << @s3.shares[2].to_s
 
         # with the final needed share provided
-        @s4.secret_set?.must_equal(true)
+        @s4.secret?.must_equal(true)
         @s4.secret.must_equal(@s3.secret)
 
         # with an extra valid share provided
         @s4 << @s3.shares[3].to_s
-        @s4.secret_set?.must_equal(true)
+        @s4.secret?.must_equal(true)
         @s4.secret.must_equal(@s3.secret)
       end
 
@@ -521,12 +513,12 @@ describe SecretSharing::Shamir::Container do
         @s2 << @s1.shares[3]
 
         # with the last remaining share missing
-        @s2.secret_set?.must_equal(false)
+        @s2.secret?.must_equal(false)
 
         @s2 << @s1.shares[4]
 
         # with the final share provided
-        @s2.secret_set?.must_equal(true)
+        @s2.secret?.must_equal(true)
         @s2.secret.must_equal(@s1.secret)
       end
 
@@ -535,12 +527,12 @@ describe SecretSharing::Shamir::Container do
         @s4 << @s3.shares[1]
 
         # with the last remaining share missing
-        @s4.secret_set?.must_equal(false)
+        @s4.secret?.must_equal(false)
 
         @s4 << @s3.shares[2]
 
         # with the final share provided
-        @s4.secret_set?.must_equal(true)
+        @s4.secret?.must_equal(true)
         @s4.secret.must_equal(@s3.secret)
       end
 
@@ -549,12 +541,12 @@ describe SecretSharing::Shamir::Container do
         @s4 << @s3.shares[1].to_s
 
         # with the last remaining share missing
-        @s4.secret_set?.must_equal(false)
+        @s4.secret?.must_equal(false)
 
         @s4 << @s3.shares[2].to_s
 
         # with the final share provided
-        @s4.secret_set?.must_equal(true)
+        @s4.secret?.must_equal(true)
         @s4.secret.must_equal(@s3.secret)
       end
 
@@ -563,17 +555,17 @@ describe SecretSharing::Shamir::Container do
         @s4 << @s3.shares[1].to_s
 
         # with the last remaining share missing
-        @s4.secret_set?.must_equal(false)
+        @s4.secret?.must_equal(false)
 
         @s4 << @s3.shares[2].to_s
 
         # with the final needed share provided
-        @s4.secret_set?.must_equal(true)
+        @s4.secret?.must_equal(true)
         @s4.secret.must_equal(@s3.secret)
 
         # with an extra valid share provided
         @s4 << @s3.shares[3].to_s
-        @s4.secret_set?.must_equal(true)
+        @s4.secret?.must_equal(true)
         @s4.secret.must_equal(@s3.secret)
       end
 
