@@ -125,28 +125,18 @@ module SecretSharing
     end
 
     # Add a secret share to the object. Accepts either a
-    # SecretSharing::Shamir::Share instance or a string representing one.
-    # Returns true if enough shares have been added to recover the secret,
-    # false otherweise.
+    # SecretSharing::Shamir::Share instance or a String representing one.
+    # Returns secret as a String if enough valid shares have been added
+    # to recover the secret, and false otherwise. The secret can also be recoverd
+    # later with SecretSharing::Shamir#secret if enough valid shares were previously
+    # provided.
     def <<(share)
-      unless share.is_a?(SecretSharing::Shamir::Share)
-        if share.is_a?(String)
-          share = SecretSharing::Shamir::Share.new(share)
-        else
-          fail ArgumentError, 'Expected SecretSharing::Shamir::Share or String'
-        end
-      end
+      # You can't add more shares than were originally generated with value of @n
+      fail ArgumentError, 'You have added more shares than allowed by the value of @n' if @received_shares.size >= @n
 
-      fail 'share has already been added' if @received_shares.include?(share)
-      fail 'we already have enough shares, no need to add more' if @received_shares.length == @k
-
-      @received_shares << share
-
-      if @received_shares.length == @k
-        recover_secret
-        return true
-      end
-      false
+      share = SecretSharing::Shamir::Share.new(share) unless share.is_a?(SecretSharing::Shamir::Share)
+      @received_shares << share unless @received_shares.include?(share)
+      recover_secret
     end
 
     # Computes the smallest prime of a given bitlength. Uses prime_fasttest
@@ -174,10 +164,8 @@ module SecretSharing
       # the bitlength by setting the highest bit to 1.
       def get_random_number(bitlength, highest_bit_one = true)
         byte_length = (bitlength / 8.0).ceil
-        rand_hex = OpenSSL::Random.random_bytes(byte_length).each_byte \
-                                  .to_a.map { |a| sprintf('%02x', a) }.join('')
-
-        rand = OpenSSL::BN.new(rand_hex, 16)
+        rand_hex    = OpenSSL::Random.random_bytes(byte_length).each_byte.to_a.map { |a| sprintf('%02x', a) }.join('')
+        rand        = OpenSSL::BN.new(rand_hex, 16)
 
         begin
           rand.mask_bits!(bitlength)
@@ -217,19 +205,23 @@ module SecretSharing
       # Evaluate the polynomial at x.
       def evaluate_polynomial_at(x)
         result = OpenSSL::BN.new('0')
+
         @coefficients.each_with_index do |coeff, i|
           result += coeff * OpenSSL::BN.new(x.to_s)**i
           result %= @prime
         end
+
         result
       end
 
       # Recover the secret by doing Lagrange interpolation.
       def recover_secret
+        return false unless @received_shares.length >= @k
+
         @secret = OpenSSL::BN.new('0')
 
         @received_shares.each do |share|
-          l_x = l(share.x, @received_shares)
+          l_x     = l(share.x, @received_shares)
           summand = share.y * l_x
           summand %= share.prime
           @secret += summand

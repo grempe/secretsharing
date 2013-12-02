@@ -348,6 +348,8 @@ describe SecretSharing::Shamir do
 
       @s3 = SecretSharing::Shamir.new(5, 3) # creator
       @s4 = SecretSharing::Shamir.new(5, 3) # recipient
+
+      @bad = SecretSharing::Shamir.new(5, 3) # a bad actor
     end
 
     describe 'with invalid shares' do
@@ -362,17 +364,67 @@ describe SecretSharing::Shamir do
 
     end
 
+    describe 'with a mix of valid and invalid shares' do
+
+      before do
+        # set a secret on both of the 'creators'
+        @s1.create_random_secret
+        @s3.create_random_secret
+        @bad.create_random_secret
+      end
+
+      it 'should be able to recover secret when k equals n and all k valid shares are provided as Shamir::Share objects' do
+        @s2 << @s1.shares[0]
+        @s2 << @s1.shares[1]
+        @s2 << @s1.shares[2]
+        @s2 << @s1.shares[3]
+
+        # with the last remaining share missing
+        @s2.secret_set?.must_equal(false)
+
+        @s2 << @s1.shares[4]
+
+        # with the final share provided
+        @s2.secret_set?.must_equal(true)
+        @s2.secret.must_equal(@s1.secret)
+      end
+
+      it 'should raise an ArgumentError if n + 1 shares are provided (more than were originally generated)' do
+        @s2 << @s1.shares[0]
+        @s2 << @s1.shares[1]
+        @s2 << @s1.shares[2]
+        @s2 << @s1.shares[3]
+        @s2.secret_set?.must_equal(false)
+        @s2 << @s1.shares[4]
+        @s2.secret_set?.must_equal(true)
+
+        -> { @s2 << @bad.shares[0] }.must_raise(ArgumentError)
+      end
+
+      it 'should not be able to recover correct secret when k equals n and k-1 valid shares and 1 invalid share are provided as Shamir::Share objects' do
+        @s2 << @s1.shares[0]
+        @s2 << @s1.shares[1]
+        @s2 << @s1.shares[2]
+        @s2 << @s1.shares[3]
+
+        # with the last remaining share missing
+        @s2.secret_set?.must_equal(false)
+
+        # with a single invalid share it will
+        # recover a secret, but it will be the *wrong* secret!
+        @s2 << @bad.shares[0]
+        @s2.secret_set?.must_equal(true)
+        @s2.secret.wont_equal(@s1.secret)
+      end
+
+    end
+
     describe 'with valid shares resulting from a random secret' do
 
       before do
         # set a secret on both of the 'creators'
         @s1.create_random_secret
         @s3.create_random_secret
-      end
-
-      it 'should raise an exception if one of the shares is provided twice' do
-        @s2 << @s1.shares[0]
-        -> { @s2 << @s1.shares[0] }.must_raise(RuntimeError)
       end
 
       it 'should be able to recover secret when k equals n and all k shares are provided as Shamir::Share objects' do
@@ -435,14 +487,23 @@ describe SecretSharing::Shamir do
         @s4.secret.must_equal(@s3.secret)
       end
 
-      it 'should be raise exception when k < n and one too many shares are provided' do
-        @s4 << @s3.shares[0]
-        @s4 << @s3.shares[1]
-        @s4 << @s3.shares[2]
+      it 'should be able to recover secret when k < n and more than minimum k shares are provided as Shamir::Share objects converted to Strings' do
+        @s4 << @s3.shares[0].to_s
+        @s4 << @s3.shares[1].to_s
+
+        # with the last remaining share missing
+        @s4.secret_set?.must_equal(false)
+
+        @s4 << @s3.shares[2].to_s
+
+        # with the final needed share provided
         @s4.secret_set?.must_equal(true)
         @s4.secret.must_equal(@s3.secret)
 
-        -> { @s4 << @s3.shares[3] }.must_raise(RuntimeError)
+        # with an extra valid share provided
+        @s4 << @s3.shares[3].to_s
+        @s4.secret_set?.must_equal(true)
+        @s4.secret.must_equal(@s3.secret)
       end
 
     end
@@ -453,11 +514,6 @@ describe SecretSharing::Shamir do
         secret = OpenSSL::BN.new('1234567890123456789012345678901234567890')
         @s1.set_fixed_secret(secret)
         @s3.set_fixed_secret(secret)
-      end
-
-      it 'should raise an exception if one of the shares is provided twice' do
-        @s2 << @s1.shares[0]
-        -> { @s2 << @s1.shares[0] }.must_raise(RuntimeError)
       end
 
       it 'should be able to recover secret when k equals n and all k shares are provided' do
@@ -504,14 +560,23 @@ describe SecretSharing::Shamir do
         @s4.secret.must_equal(@s3.secret)
       end
 
-      it 'should be raise exception when k < n and one too many shares are provided' do
-        @s4 << @s3.shares[0]
-        @s4 << @s3.shares[1]
-        @s4 << @s3.shares[2]
+      it 'should be able to recover secret when k < n and more than minimum k shares are provided as Shamir::Share objects converted to Strings' do
+        @s4 << @s3.shares[0].to_s
+        @s4 << @s3.shares[1].to_s
+
+        # with the last remaining share missing
+        @s4.secret_set?.must_equal(false)
+
+        @s4 << @s3.shares[2].to_s
+
+        # with the final needed share provided
         @s4.secret_set?.must_equal(true)
         @s4.secret.must_equal(@s3.secret)
 
-        -> { @s4 << @s3.shares[3] }.must_raise(RuntimeError)
+        # with an extra valid share provided
+        @s4 << @s3.shares[3].to_s
+        @s4.secret_set?.must_equal(true)
+        @s4.secret.must_equal(@s3.secret)
       end
 
     end
