@@ -11,11 +11,14 @@
    It has been further enhanced for Ruby, and a full minitest test suite added,
    by Glenn Rempe.
 
-== Prerequisites
-   This package requires Ruby 1.8.7 or later.
+== Supported Ruby Versions
 
-   The 'bundler' gem should be installed if you want to
-   do development or testing for this gem.
+   This gem is tested on each push using the Travis CI
+   automated build and test tool.  You can view which Ruby
+   versions are currently passing or failing (on master branch)
+   by visiting:
+
+   https://travis-ci.org/grempe/secretsharing
 
 == Installation Instructions
 
@@ -70,6 +73,10 @@
    # Install the gem to your local system
    # from the cloned repository code.
    rake install
+
+   # View the automated build results on travisci.org
+   # for all supported Rubies.
+   https://travis-ci.org/grempe/secretsharing
 
 == Copyright
    (c) 2010-2013 Alexander Klink, Glenn Rempe
