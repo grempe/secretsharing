@@ -1,112 +1,118 @@
-== Description
-   A library for sharing secrets in an information-theoretically secure way.
-   It uses Shamir's secret sharing to enable sharing a (random) secret between
-   n persons where k <= n persons are enough to recover the secret. k-1 secret
-   share holders learn nothing about the secret when they combine their shares.
+# SecretSharing
 
-   This library is based on the OpenXPKI::Crypto::Secret::Split Perl module used
-   in the open source PKI software OpenXPKI, which was written by Alexander Klink
-   for the OpenXPKI project in 2006.
+## Description
+A Ruby gem for sharing secrets in an information-theoretically secure way.
 
-   It has been further enhanced for Ruby, and a full minitest test suite added,
-   by Glenn Rempe.
+It uses Shamir's secret sharing to enable sharing a (random) secret
+between n persons where k <= n shares are enough to recover the secret. 
 
-== Supported Ruby Versions
+k-1 secret share holders learn nothing about the secret when they combine their shares.
 
-   This gem is tested on each push using the Travis CI
-   automated build and test tool.  You can view which Ruby
-   versions are currently passing or failing (on master branch)
-   by visiting:
+Learn More:
 
-   https://travis-ci.org/grempe/secretsharing
+<http://en.wikipedia.org/wiki/Shamir's_Secret_Sharing>
 
-   Current Travis CI Build Status:
+### History
 
-   [![Build Status](https://travis-ci.org/grempe/secretsharing.png)](https://travis-ci.org/grempe/secretsharing)
+This library is based on the OpenXPKI::Crypto::Secret::Split Perl module
+used in the open source PKI software OpenXPKI, which was written by
+Alexander Klink for the OpenXPKI project in 2006.
 
-== Installation Instructions
+It has been further enhanced, modularized, and a full test suite
+has been added by Glenn Rempe (<glenn@rempe.us>) and can be found
+at <https://github.com/grempe/secretsharing>.
 
-   gem install secretsharing
+### Current Travis CI Build Status for all Rubies:
 
-   - or -
+This gem is tested after each git push to the master branch
+using the Travis CI automated build and test tool against a large
+number of Ruby runtimes (MRI, JRuby, REE, RBX). The current
+build status is (click for details):
 
-   # Add the following to your Gemfile
-   gem "secretsharing", ">=0.3"
+[![Build Status](https://travis-ci.org/grempe/secretsharing.png)](https://travis-ci.org/grempe/secretsharing)
 
-== Usage
+## Installation Instructions
 
-   require 'secretsharing'
+    gem install secretsharing
 
-   # create an object for 3 out of 5 secret sharing
-   s = SecretSharing::Shamir.new(5,3)
+*or in your ````Gemfile````*
 
-   # create a random secret (returns the secret)
-   s.create_random_secret
+    gem "secretsharing", ">=0.3"
 
-   # show secret
-   puts s.secret
+## Usage
 
-   # show password representation of secret (Base64)
-   puts s.secret_password
+    require 'secretsharing'
 
-   # show shares
-   s.shares.each { |share| puts share }
+    # create an object for 3 out of 5 secret sharing
+    s = SecretSharing::Shamir.new(5,3)
 
-   # recover secret from shares
-   s2 = SecretSharing::Shamir.new(3)
+    # create a random secret (returns the secret)
+    s.create_random_secret
 
-   # Accepts SecretSharing::Shamir::Share objects or
-   # string representations thereof
-   s2 << s.shares[0]
-   s2 << s.shares[2]
-   s2 << s.shares[4]
-   puts s2.secret
+    # show secret
+    puts s.secret
 
-== Development and Testing
+    # show password representation of secret (Base64)
+    puts s.secret_password
 
-   # Install the gemfile dependencies
-   bundle install
+    # show shares
+    s.shares.each { |share| puts share }
 
-   # Run the test suite
-   rake test
+    # recover secret from shares
+    s2 = SecretSharing::Shamir.new(3)
 
-   # Run the test suite continuously
-   # upon watched file changes.
-   bundle exec rerun -x rake test
+    # Accepts SecretSharing::Shamir::Share objects or
+    # string representations thereof
+    s2 << s.shares[0]
+    s2 << s.shares[2]
+    s2 << s.shares[4]
+    puts s2.secret
 
-   # Install the gem to your local system
-   # from the cloned repository code.
-   rake install
+## Development and Testing
 
-   # View the automated build results on travisci.org
-   # for all supported Rubies.
-   https://travis-ci.org/grempe/secretsharing
+    # Install the gemfile dependencies
+    bundle install
 
-== Copyright
-   (c) 2010-2013 Alexander Klink, Glenn Rempe
+    # Run the test suite
+    rake test
 
-== License
-   Licensed under the Apache License, Version 2.0 (the "License");
-   you may not use this file except in compliance with the License.
-   You may obtain a copy of the License at
+    # Run the test suite continuously
+    # upon watched file changes.
+    bundle exec rerun -x rake test
 
-   http://www.apache.org/licenses/LICENSE-2.0
+    # Install the gem to your local system
+    # from the cloned repository code.
+    rake install
 
-== Warranty
-   Unless required by applicable law or agreed to in writing, software
-   distributed under the License is distributed on an "AS IS" BASIS,
-   WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-   See the License for the specific language governing permissions and
-   limitations under the License.
+## Copyright
 
-== Authors
+(c) 2010-2013 Alexander Klink and Glenn Rempe
 
-   Alexander Klink
-   secretsharing@alech.de
-   http://www.alech.de
-   @alech on Twitter
+## License
 
-   Glenn Rempe
-   glenn@rempe.us
-   http://www.rempe.us
-   @grempe on Twitter
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+## Warranty
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND,
+either express or implied. See the LICENSE.txt file for the
+specific language governing permissions and limitations under
+the License.
+
+## Authors
+
+***Alexander Klink***  
+<secretsharing@alech.de>  
+<http://www.alech.de>  
+@alech on Twitter  
+
+***Glenn Rempe***  
+<glenn@rempe.us>  
+<http://www.rempe.us>  
+@grempe on Twitter  
