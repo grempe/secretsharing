@@ -50,7 +50,10 @@ build status is (click for details):
     c1 = SecretSharing::Shamir::Container.new(5,3)
 
     # create a random secret (returns the secret)
-    c1.create_random_secret
+    c1.secret = SecretSharing::Shamir::Secret.new
+
+    # (or create a fixed secret of your choice by passing in an OpenSSL::BN object)
+    c1.secret = SecretSharing::Shamir::Secret.new(OpenSSL::BN.new('123456789'))
 
     # show secret
     puts c1.secret
@@ -61,7 +64,8 @@ build status is (click for details):
     # show shares
     c1.shares.each { |share| puts share }
 
-    # recover secret from shares
+    # recover secret from shares by using a new Container
+    # where the number of Shares expected is the same.
     c2 = SecretSharing::Shamir::Container.new(3)
 
     # Accepts SecretSharing::Shamir::Share objects or
@@ -69,6 +73,8 @@ build status is (click for details):
     c2 << c1.shares[0]
     c2 << c1.shares[2]
     c2 << c1.shares[4]
+    
+    c2.secret? #=> true
     puts c2.secret
 
 ## Development and Testing

@@ -25,25 +25,9 @@ module SecretSharing
     #   http://www.cs.tau.ac.il/~bchor/Shamir.html
     #   http://en.wikipedia.org/wiki/Secret_sharing#Shamir.27s_scheme
     #
-    # To share a secret, create a new SecretSharing::Shamir::Container object and
-    # then call the create_random_secret() method. The secret is now in
-    # the secret attribute and the shares are an array in the shares attribute.
-    #
-    # Alternatively, you can call the set_fixed_secret() method with an
-    # OpenSSL::BN object (or something that can be passed to OpenSSL::BN.new)
-    # to set your own secret.
-    #
-    # To recover a secret, create another SecretSharing::Shamir::Container object and
-    # add the necessary shares to it using the '<<' method. Once enough
-    # shares have been added, the secret can be recovered in the secret
-    # attribute.
-    #
     class Container
-      attr_reader :n, :k, :secret, :secret_bitlength, :shares
-
-      MIN_SECRET_BITLENGTH     = 1
-      DEFAULT_SECRET_BITLENGTH = 256
-      MAX_SECRET_BITLENGTH     = 4096
+      include SecretSharing::Shamir
+      attr_reader :n, :k, :secret, :shares
 
       MIN_SHARES               = 2
       MAX_SHARES               = 512
@@ -83,38 +67,17 @@ module SecretSharing
         @secret.is_a?(SecretSharing::Shamir::Secret)
       end
 
-      # Create a random secret of a certain bitlength. Returns the
-      # secret and stores it in the 'secret' attribute.
-      def create_random_secret(bitlength = DEFAULT_SECRET_BITLENGTH)
-        fail 'a secret has already been set' if secret?
-        fail ArgumentError, "min bitlength is #{MIN_SECRET_BITLENGTH}" if bitlength < MIN_SECRET_BITLENGTH
-        fail ArgumentError, "max bitlength is #{MAX_SECRET_BITLENGTH}" if bitlength > MAX_SECRET_BITLENGTH
-
-        @secret = SecretSharing::Shamir::Secret.new(get_random_number(bitlength))
-        @secret_bitlength = bitlength
+      def secret=(sec)
+        fail ArgumentError, 'secret has already been set' if secret?
+        fail ArgumentError, 'secret must be a SecretSharing::Shamir::Secret instance' unless sec.is_a?(SecretSharing::Shamir::Secret)
+        @secret = sec
         create_shares
-        @secret
+        true
       end
 
-      # Set the secret to a fixed OpenSSL::BN value. Stores it
-      # in the 'secret' attribute, creates the corresponding shares and
-      # returns the secret
-      def set_fixed_secret(secret)
-        fail 'a secret has already been set' if secret?
-
-        secret = OpenSSL::BN.new(secret) unless secret.is_a?(OpenSSL::BN)
-        fail "the bitlength of the fixed secret provided is #{secret.num_bits}, the min bitlength allowed is #{MIN_SECRET_BITLENGTH}" if secret.num_bits < MIN_SECRET_BITLENGTH
-        fail "the bitlength of the fixed secret provided is #{secret.num_bits}, the max bitlength allowed is #{MAX_SECRET_BITLENGTH}" if secret.num_bits > MAX_SECRET_BITLENGTH
-
-        @secret = SecretSharing::Shamir::Secret.new(secret)
-        @secret_bitlength = secret.num_bits
-        create_shares
-        @secret
-      end
-
-      # Add a secret share to the object. Accepts either a
-      # SecretSharing::Shamir::Share instance or a String representing one.
-      # Returns secret as a String if enough valid shares have been added
+      # Add a secret share to the object. Accepts a
+      # SecretSharing::Shamir::Share instance.
+      # Returns secret as a SecretSharing::Shamir::Secret if enough valid shares have been added
       # to recover the secret, and false otherwise. The secret can also be recovered
       # later with SecretSharing::Shamir::Container#secret if enough valid shares were previously
       # provided.
@@ -127,44 +90,7 @@ module SecretSharing
         recover_secret
       end
 
-      # Computes the smallest prime of a given bitlength. Uses prime_fasttest
-      # from the OpenSSL library with 20 attempts to be compatible to openssl
-      # prime, which is used in the OpenXPKI::Crypto::Secret::Split library.
-      def self.smallest_prime_of_bitlength(bitlength)
-        # start with 2^bit_length + 1
-        test_prime = OpenSSL::BN.new((2**bitlength + 1).to_s)
-        prime_found = false
-
-        until prime_found
-          # prime_fasttest? 20 do be compatible to
-          # openssl prime, which is used in
-          # OpenXPKI::Crypto::Secret::Split
-          prime_found = test_prime.prime_fasttest? 20
-          test_prime += 2
-        end
-
-        test_prime
-      end
-
       private
-
-        # Creates a random number of a certain bitlength, optionally ensuring
-        # the bitlength by setting the highest bit to 1.
-        def get_random_number(bitlength, highest_bit_one = true)
-          byte_length = (bitlength / 8.0).ceil
-          rand_hex    = OpenSSL::Random.random_bytes(byte_length).each_byte.to_a.map { |a| sprintf('%02x', a) }.join('')
-          rand        = OpenSSL::BN.new(rand_hex, 16)
-
-          begin
-            rand.mask_bits!(bitlength)
-          rescue OpenSSL::BNError
-            # never mind if there was an error, this just means
-            # rand was already smaller than 2^bitlength - 1
-          end
-
-          rand.set_bit!(bitlength) if highest_bit_one
-          rand
-        end
 
         # Creates the shares by computing random coefficients for a polynomial
         # and then computing points on this polynomial.
@@ -173,12 +99,12 @@ module SecretSharing
           @coefficients[0] = @secret.secret
 
           # round up to next nibble
-          next_nibble_bitlength = @secret_bitlength + (4 - (@secret_bitlength % 4))
+          next_nibble_bitlength = @secret.bitlength + (4 - (@secret.bitlength % 4))
           prime_bitlength       = next_nibble_bitlength + 1
-          @prime                = self.class.smallest_prime_of_bitlength(prime_bitlength)
+          @prime                = smallest_prime_of_bitlength(prime_bitlength)
 
           # compute random coefficients
-          (1..k - 1).each { |x| @coefficients[x] = get_random_number(@secret_bitlength) }
+          (1..k - 1).each { |x| @coefficients[x] = get_random_number(@secret.bitlength) }
 
           (1..n).each { |x| @shares[x - 1] = construct_share(x, prime_bitlength) }
         end
@@ -206,7 +132,7 @@ module SecretSharing
         def recover_secret
           return false unless @received_shares.length >= @k
 
-          @secret = SecretSharing::Shamir::Secret.new
+          @secret = SecretSharing::Shamir::Secret.new(OpenSSL::BN.new('0'))
 
           @received_shares.each do |share|
             l_x     = l(share.x, @received_shares)

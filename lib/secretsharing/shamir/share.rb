@@ -20,6 +20,7 @@ module SecretSharing
     # Shamir secret sharing scheme. The share consists of a point (x,y) on
     # a polynomial over Z/Zp, where p is a prime.
     class Share
+      include SecretSharing::Shamir
       attr_reader :x, :y, :prime, :prime_bitlength
 
       FORMAT_VERSION = '0'
@@ -46,7 +47,7 @@ module SecretSharing
           validate_checksum(checksum, p_x_str)
 
           @prime_bitlength  = 4 * string[-2, 2].hex + 1
-          @prime = SecretSharing::Shamir::Container.smallest_prime_of_bitlength(@prime_bitlength)
+          @prime = smallest_prime_of_bitlength(@prime_bitlength)
         elsif x_or_string_share && y && prime && prime_bitlength
           @x                = x_or_string_share
           @y                = y

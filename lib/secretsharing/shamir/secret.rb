@@ -21,16 +21,26 @@ module SecretSharing
     # argument when creating a new SecretSharing::Shamir::Container or
     # can be the output from a Container that has successfully decoded shares.
     class Secret
+      include SecretSharing::Shamir
+
+      DEFAULT_BITLENGTH = 256
+      MAX_BITLENGTH     = 4096
+
+      attr_reader :secret, :bitlength
       attr_accessor :secret
 
-      def initialize(secret = OpenSSL::BN.new('0'))
+# FIXME : allow creation of a secret initialized with a string of numbers that convert to a OpenSSL::BN or with a base64 representation of the same.
+
+      def initialize(secret = get_random_number(SecretSharing::Shamir::Secret::DEFAULT_BITLENGTH))
         @secret = secret
-        fail ArgumentError, 'secret must be an OpenSSL::BN' unless @secret.is_a?(OpenSSL::BN)
+        fail ArgumentError, 'Secret must be an OpenSSL::BN' unless @secret.is_a?(OpenSSL::BN)
+        @bitlength = @secret.num_bits
+        fail ArgumentError, "Secret must have a bitlength less than or equal to #{MAX_BITLENGTH}" if @bitlength > MAX_BITLENGTH
       end
 
       # Secrets are equal if the OpenSSL::BN in @secret is the same.
       def ==(other)
-        other == secret
+        other == @secret
       end
 
       def secret?
@@ -38,9 +48,13 @@ module SecretSharing
       end
 
       # The secret in a password representation
+      # FIXME : Do we need this?  And if so shouldn't the Secret be able to be initialized with it to reverse the process?
       def to_base64
-        return nil unless secret?
         Base64.encode64([@secret.to_s(16)].pack('h*')).split("\n").join
+      end
+
+      def to_s
+        @secret.to_s
       end
     end # class Secret
   end # module Shamir

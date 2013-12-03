@@ -19,6 +19,7 @@ require 'digest/sha1'
 require 'base64'
 
 require 'secretsharing/version'
+require 'secretsharing/shamir'
 require 'secretsharing/shamir/container'
 require 'secretsharing/shamir/share'
 require 'secretsharing/shamir/secret'
