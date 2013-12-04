@@ -65,6 +65,11 @@ describe SecretSharing::Shamir::Secret do
       s.bitlength.is_a?(Integer).must_equal(true)
       s.bitlength.must_equal(num.num_bits)
     end
+
+    it 'must throw an exception if initialized with a String that does not base64 re-hydrate as expected from the output of #to_s' do
+      lambda { SecretSharing::Shamir::Secret.new('foo') }.must_raise(ArgumentError)
+    end
+
   end # describe initialization
 
   describe '==' do
@@ -92,19 +97,16 @@ describe SecretSharing::Shamir::Secret do
     end
   end
 
-  describe 'to_base64' do
-    it 'must return a proper and consistent base64 encoded String representation of @secret' do
-      num = OpenSSL::BN.new('1234567890123456789012345678901234567890')
-      s = SecretSharing::Shamir::Secret.new(num)
-      s.to_base64.must_equal('MAqcAlcMvT+Lysv1aezzoC0=')
-    end
-  end
-
   describe 'to_s' do
-    it 'must return a proper and consistent String representation of @secret' do
+    it 'must return a proper and consistent URL safe encoded String representation of @secret and allow round trip of that String' do
       num = OpenSSL::BN.new('1234567890123456789012345678901234567890')
-      s = SecretSharing::Shamir::Secret.new(num)
-      s.to_s.must_equal(num.to_s)
+      s1 = SecretSharing::Shamir::Secret.new(num)
+      s1_str = s1.to_s
+      s1_str.must_equal('MWl6aWJqZjR6dmRibXZxNjZkNndtOGcxY2k=')
+
+      # Re-hydrate a new Secret object from the previously de-hydrated String
+      s2 = SecretSharing::Shamir::Secret.new(s1_str)
+      s2.must_equal(s1)
     end
   end
 end # describe SecretSharing::Shamir::Secret

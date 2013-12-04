@@ -20,18 +20,33 @@ module SecretSharing
     # Shamir secret sharing scheme. Secrets can be passed in as an input
     # argument when creating a new SecretSharing::Shamir::Container or
     # can be the output from a Container that has successfully decoded shares.
+    # A new Secret take 0 or 1 args. Zero args means the Secret will be initialized
+    # with a random OpenSSL::BN object with the Secret::DEFAULT_BITLENGTH. If a
+    # single argument is passed it can be one of two object types, String or
+    # OpenSSL::BN.  If a String it is expected to be a specially encoded String
+    # that was generated as the output of calling #to_s on another Secret object.
+    # If the object type is OpenSSL::BN it can represent a number up to 4096 num_bits
+    # in length as reported by OpenSSL::BN#num_bits.
+    #
+    # All secrets are internally represented as an OpenSSL::BN which can be retrieved
+    # in its raw form using #secret.
+    #
     class Secret
       include SecretSharing::Shamir
 
       DEFAULT_BITLENGTH = 256
       MAX_BITLENGTH     = 4096
 
-      attr_reader :secret, :bitlength
+      attr_reader :bitlength
       attr_accessor :secret
 
-# FIXME : allow creation of a secret initialized with a string of numbers that convert to a OpenSSL::BN or with a base64 representation of the same.
-
       def initialize(secret = get_random_number(SecretSharing::Shamir::Secret::DEFAULT_BITLENGTH))
+        if secret.is_a?(String)
+          # Decode a Base64.urlsafe_encode64 String which contains a Base 36 encoded Bignum back into an OpenSSL::BN
+          # See : Secret#to_s for forward encoding method.
+          secret = OpenSSL::BN.new(Base64.urlsafe_decode64(secret).to_i(36).to_s)
+        end
+
         @secret = secret
         fail ArgumentError, 'Secret must be an OpenSSL::BN' unless @secret.is_a?(OpenSSL::BN)
         @bitlength = @secret.num_bits
@@ -47,14 +62,12 @@ module SecretSharing
         @secret.is_a?(OpenSSL::BN)
       end
 
-      # The secret in a password representation
-      # FIXME : Do we need this?  And if so shouldn't the Secret be able to be initialized with it to reverse the process?
-      def to_base64
-        Base64.encode64([@secret.to_s(16)].pack('h*')).split("\n").join
-      end
-
       def to_s
-        @secret.to_s
+        # Convert the OpenSSL::BN secret to an Bignum which has a #to_s(36) method
+        # Convert the Bignum to a Base 36 encoded String
+        # Wrap the Base 36 encoded String as a URL safe Base 64 encoded String
+        # Combined this should result in a relatively compact and portable String
+        Base64.urlsafe_encode64(@secret.to_i.to_s(36))
       end
     end # class Secret
   end # module Shamir
