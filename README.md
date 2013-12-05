@@ -26,6 +26,12 @@ has been added by Glenn Rempe (<glenn@rempe.us>) and can be found
 at <https://github.com/grempe/secretsharing>. The public API of
 this new Gem is *not* backwards compatible with 'secretsharing' <= '0.3'.
 
+## Is it ready?
+
+This code has not yet been tested in production.  It is seemingly well tested though with a full Minitest suite and 100% test code coverage and appears to be working well for what it was designed to do.  The code also undergoes a continuous integration test run on many different Ruby runtimes upon every push.
+
+The mathematics of the code, which is critical to its operation, and its suitability for use as a security product have not yet been tested or verified by security minded folks. `Yet`. If you are one of those strongly mathematically or security minded folks please do get in touch if you think you can help validate the current implementation. Suggestions or concerns welcome.
+
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -77,36 +83,62 @@ Or install it yourself as:
 
 ## Development and Testing
 
-    # Install the gemfile dependencies
+Install the gemfile dependencies:
+
     bundle install
 
-    # Run the test suite
+Run the test suite:
+
     rake test
 
-    # Run the test suite continuously
-    # upon watched file changes.
+Or run the test suite continuously upon watched file changes:
+
     bundle exec rerun -x rake test
 
-    # Install the gem to your local system
-    # from the cloned repository code.
+Build and Install the gem to your local system from the cloned repository:
+
     rake install
 
 ### Code Quality:
 
-This gem is tested after each git push to the master branch
-using the Travis CI automated build and test tool against a large
-number of Ruby runtimes (MRI, JRuby, REE, RBX). The current
-build status is (click for details):
+#### Bug Reporting
+
+We love bug reports and pull requests.
+
+<https://github.com/grempe/secretsharing/issues>
+
+#### Travis CI
 
 [![Build Status](https://travis-ci.org/grempe/secretsharing.png)](https://travis-ci.org/grempe/secretsharing)
 
-Code quality and metrics are also being monitored courtest of Code Climate (<https://codeclimate.com>).
+This gem is tested after each git push to the master branch
+using the [Travis CI](https://travis-ci.org/grempe/secretsharing) automated build and test service against several versions of a the most popular Ruby runtimes (MRI 1.8.7, 1.9.3, 2.0.0, JRuby, REE, Rubinious). A build must be green on all of them to be considered for release.
+
+A `.travis.yml` file has been added to this project to define which Ruby versions will be tested. Additionally a `gemfiles/Gemfile.ci` file has been created to specify a custom minimal Gemspec to be run on the test hosts.  Contributors are not to modify these files.
+
+#### Code Climate
+
+[![Code Climate](https://codeclimate.com/github/grempe/secretsharing.png)](https://codeclimate.com/github/grempe/secretsharing)
+
+Code quality and metrics over time are being monitored courtesy of [Code Climate](<https://codeclimate.com>).
 
 <https://codeclimate.com/github/grempe/secretsharing>
 
-### Semantic Versioning
+#### Rubocop
+
+[RuboCop](https://github.com/bbatsov/rubocop) is a Ruby static code analyzer. Out of the box it will enforce many of the guidelines outlined in the community [Ruby Style Guide](https://github.com/bbatsov/ruby-style-guide). A clean `rubocop` run against all `lib` and `spec` code is necessary for a build to be considered for release.
+
+A `.rubocop.yml` file has been added to this project to define any style exceptions.  Contributors are not to modify this file.
+
+#### COCO
+
+The [COCO](http://lkdjiin.github.io/coco/) gem provides automatic test code coverage analysis for ruby 1.9.2, 1.9.3 and 2.0. It will be run every time `rake test` is run.  If there are any files that are not 100% covered an output report will be generated in `coverage/index.html' and a summary line will be added at the end of the `rake test` output.  It is expected that 100% test coverage will be maintained.
+
+A `.coco.yml` file has been added to this project to define any coverage exceptions.  Contributors are not to modify this file.
+
+#### Semantic Versioning
 This Gem, and its version number, tries its best to adhere to the
-'Semantic Versioning 2.0.0' strategy espoused at : <http://semver.org>
+'Semantic Versioning' strategy espoused at : <http://semver.org>
 
 ### Contributing
 
@@ -122,20 +154,21 @@ This Gem, and its version number, tries its best to adhere to the
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
 
+## Legal
 
-## Copyright
+### Copyright
 
 (c) 2010-2013 Alexander Klink and Glenn Rempe
 
-## License
+### License
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
 
-http://www.apache.org/licenses/LICENSE-2.0
+<http://www.apache.org/licenses/LICENSE-2.0>
 
-## Warranty
+### Warranty
 
 Unless required by applicable law or agreed to in writing,
 software distributed under the License is distributed on an
