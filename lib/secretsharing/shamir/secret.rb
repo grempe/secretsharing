@@ -44,7 +44,9 @@ module SecretSharing
         if secret.is_a?(String)
           # Decode a Base64.urlsafe_encode64 String which contains a Base 36 encoded Bignum back into an OpenSSL::BN
           # See : Secret#to_s for forward encoding method.
-          secret = OpenSSL::BN.new(urlsafe_decode64(secret).to_i(36).to_s)
+          decoded_secret = urlsafe_decode64(secret)
+          fail ArgumentError, 'invalid base64 (returned nil or empty String)' if decoded_secret.empty?
+          secret = OpenSSL::BN.new(decoded_secret.to_i(36).to_s)
         end
 
         @secret = secret
@@ -76,10 +78,10 @@ module SecretSharing
         def urlsafe_decode64(str)
           return Base64.urlsafe_decode64(str) if Base64.respond_to?(:urlsafe_decode64)
 
-          unless str.include?("\n")
-            Base64.decode64(str)
+          if str.include?('\n')
+            fail(ArgumentError, 'invalid base64')
           else
-            fail(ArgumentError, "invalid base64")
+            Base64.decode64(str)
           end
         end
 
@@ -88,7 +90,6 @@ module SecretSharing
           return Base64.urlsafe_encode64(bin) if Base64.respond_to?(:urlsafe_encode64)
           Base64.encode64(bin).tr("\n", '')
         end
-
     end # class Secret
   end # module Shamir
 end # module SecretSharing

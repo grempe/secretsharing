@@ -44,10 +44,6 @@ describe SecretSharing::Shamir::Secret do
       s.bitlength.is_a?(Integer).must_equal(true)
     end
 
-    it 'must raise an ArgumentError if a String instead of an OpenSSL::BN is provided to the constructor' do
-      lambda { SecretSharing::Shamir::Secret.new('foo') }.must_raise(ArgumentError)
-    end
-
     it 'must raise an ArgumentError if an Integer instead of an OpenSSL::BN is provided to the constructor' do
       lambda { SecretSharing::Shamir::Secret.new(1_234_567_890) }.must_raise(ArgumentError)
     end
