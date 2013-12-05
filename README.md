@@ -8,9 +8,7 @@ between n persons where k <= n shares are enough to recover the secret.
 
 k-1 secret share holders learn nothing about the secret when they combine their shares.
 
-Learn More:
-
-<http://en.wikipedia.org/wiki/Shamir's_Secret_Sharing>
+Learn More about [Shamir's Secret Sharing](http://en.wikipedia.org/wiki/Shamir's_Secret_Sharing)
 
 ### Development History
 
