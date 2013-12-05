@@ -60,7 +60,6 @@ module SecretSharing
 
         @secret          = nil
         @shares          = []
-        @received_shares = []
       end
 
       def secret?
@@ -83,10 +82,10 @@ module SecretSharing
       # provided.
       def <<(share)
         # You can't add more shares than were originally generated with value of @n
-        fail ArgumentError, 'You have added more shares than allowed by the value of @n' if @received_shares.size >= @n
+        fail ArgumentError, 'You have added more shares than allowed by the value of @n' if @shares.size >= @n
 
         share = SecretSharing::Shamir::Share.new(share) unless share.is_a?(SecretSharing::Shamir::Share)
-        @received_shares << share unless @received_shares.include?(share)
+        @shares << share unless @shares.include?(share)
         recover_secret
       end
 
@@ -130,12 +129,12 @@ module SecretSharing
 
         # Recover the secret by doing Lagrange interpolation.
         def recover_secret
-          return false unless @received_shares.length >= @k
+          return false unless @shares.length >= @k
 
           @secret = SecretSharing::Shamir::Secret.new(OpenSSL::BN.new('0'))
 
-          @received_shares.each do |share|
-            l_x     = l(share.x, @received_shares)
+          @shares.each do |share|
+            l_x     = l(share.x, @shares)
             summand = share.y * l_x
             summand %= share.prime
             @secret.secret += summand
