@@ -66,6 +66,52 @@ describe SecretSharing::Shamir::Secret do
       lambda { SecretSharing::Shamir::Secret.new('foo') }.must_raise(ArgumentError)
     end
 
+    it 'must throw an exception if initialized with a String that contains \n on platform that is not true for Base64.respond_to?(:urlsafe_encode64)' do
+      Base64.stub(:respond_to?, false) do
+        lambda { SecretSharing::Shamir::Secret.new('foo\nbar') }.must_raise(ArgumentError)
+      end
+    end
+
+    it 'must use Base64.decode64 instead of Base64.urlsafe_decode64 on platform that is not true for Base64.respond_to?(:urlsafe_encode64)' do
+      Base64.stub(:respond_to?, false) do
+        num = OpenSSL::BN.new('1234567890123456789012345678901234567890')
+        s1 = SecretSharing::Shamir::Secret.new(num)
+        s1_str = s1.to_s
+        s1_str.must_equal('MWl6aWJqZjR6dmRibXZxNjZkNndtOGcxY2k=')
+
+        # Re-hydrate a new Secret object from the previously de-hydrated String
+        s2 = SecretSharing::Shamir::Secret.new(s1_str)
+        s2.must_equal(s1)
+      end
+    end
+
+    it 'must decode to the SAME String on mixed platforms that are, or are not, truthy for Base64.respond_to?(:urlsafe_decode64)' do
+
+      # NOTE : OpenSSL::BN.new('1234567890123456789012345678901234567890')
+      str = 'MWl6aWJqZjR6dmRibXZxNjZkNndtOGcxY2k='
+      s2 = nil
+      s3 = nil
+
+      s1 = SecretSharing::Shamir::Secret.new(str)
+      s1_str = s1.to_s
+      s1_str.must_equal(str)
+
+      Base64.stub(:respond_to?, false) do
+        s2 = SecretSharing::Shamir::Secret.new(str)
+        s2_str = s2.to_s
+        s2_str.must_equal(str)
+      end
+
+      Base64.stub(:respond_to?, false) do
+        s3 = SecretSharing::Shamir::Secret.new(str)
+        s3_str = s3.to_s
+        s3_str.must_equal(str)
+      end
+
+      s1.must_equal(s2)
+      s1.must_equal(s3)
+    end
+
   end # describe initialization
 
   describe '==' do
