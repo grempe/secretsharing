@@ -22,12 +22,8 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  # The libary will make use of Netrand to get
-  # random data from Random.org if installed.
-  s.add_development_dependency 'netrand'
-
   s.add_development_dependency 'minitest'
-  s.add_development_dependency 'coco' if RUBY_PLATFORM == 'java'
+  s.add_development_dependency 'coco'
   s.add_development_dependency 'rb-fsevent'
   s.add_development_dependency 'rerun'
   s.add_development_dependency 'rubocop'
