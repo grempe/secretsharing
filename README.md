@@ -26,15 +26,6 @@ has been added by Glenn Rempe (<glenn@rempe.us>) and can be found
 at <https://github.com/grempe/secretsharing>. The public API of
 this new Gem is *not* backwards compatible with 'secretsharing' <= '0.3'.
 
-### Current Travis CI Build Status for all Rubies:
-
-This gem is tested after each git push to the master branch
-using the Travis CI automated build and test tool against a large
-number of Ruby runtimes (MRI, JRuby, REE, RBX). The current
-build status is (click for details):
-
-[![Build Status](https://travis-ci.org/grempe/secretsharing.png)](https://travis-ci.org/grempe/secretsharing)
-
 ## Installation
 
 Add this line to your application's Gemfile:
@@ -100,11 +91,24 @@ Or install it yourself as:
     # from the cloned repository code.
     rake install
 
-## Semantic Versioning
+### Code Quality:
+
+This gem is tested after each git push to the master branch
+using the Travis CI automated build and test tool against a large
+number of Ruby runtimes (MRI, JRuby, REE, RBX). The current
+build status is (click for details):
+
+[![Build Status](https://travis-ci.org/grempe/secretsharing.png)](https://travis-ci.org/grempe/secretsharing)
+
+Code quality and metrics are also being monitored courtest of Code Climate (<https://codeclimate.com>).
+
+<https://codeclimate.com/github/grempe/secretsharing>
+
+### Semantic Versioning
 This Gem, and its version number, tries its best to adhere to the
 'Semantic Versioning 2.0.0' strategy espoused at : <http://semver.org>
 
-## Contributing
+### Contributing
 
 	IMPORTANT
     Please do not change the VERSION number within your commits.
