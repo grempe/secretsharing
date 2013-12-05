@@ -32,7 +32,7 @@ module SecretSharing
         if x_or_string_share.is_a?(String) && y.nil? && prime.nil? && prime_bitlength.nil?
           # Create a new share from a string format representation. For
           # a discussion of the format, see the to_s() method.
-          string = x_or_string_share
+          string            = x_or_string_share
           @x                = string[1, 2].hex
           p_x_str           = string[3, string.length - 9]
           checksum          = string[-6, 4]
