@@ -74,7 +74,7 @@ module SecretSharing
 
       private
 
-        # Backported for ruby 1.8.7, REE, jruby
+        # Backported for Ruby 1.8.7, REE, JRuby, Rubinious
         def urlsafe_decode64(str)
           return Base64.urlsafe_decode64(str) if Base64.respond_to?(:urlsafe_decode64)
 
@@ -85,7 +85,7 @@ module SecretSharing
           end
         end
 
-        # Backported for ruby 1.8.7, REE, jruby
+        # Backported for Ruby 1.8.7, REE, JRuby, Rubinious
         def urlsafe_encode64(bin)
           return Base64.urlsafe_encode64(bin) if Base64.respond_to?(:urlsafe_encode64)
           Base64.encode64(bin).tr("\n", '')
