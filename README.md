@@ -23,7 +23,8 @@ can be found at <http://repo.or.cz/w/secretsharing.git>
 
 It has been further enhanced, modularized, and a full test suite
 has been added by Glenn Rempe (<glenn@rempe.us>) and can be found
-at <https://github.com/grempe/secretsharing>.
+at <https://github.com/grempe/secretsharing>. The public API of
+this new Gem is *not* backwards compatible with 'secretsharing' <= '0.3'.
 
 ### Current Travis CI Build Status for all Rubies:
 
@@ -99,13 +100,24 @@ Or install it yourself as:
     # from the cloned repository code.
     rake install
 
+## Semantic Versioning
+This Gem, and its version number, tries its best to adhere to the
+'Semantic Versioning 2.0.0' strategy espoused at : <http://semver.org>
+
 ## Contributing
+
+	IMPORTANT
+    Please do not change the VERSION number within your commits.
+    Please include tests that are passing 100% within your commits.
+    Please ensure that you maintain 100% test code coverage as reported by 'coco' which is run after every `rake test` automatically.
+    Please run the `rubocop` tool to ensure you are consistent with Ruby style guidelines for this project.
 
 1. Fork it
 2. Create your feature branch (`git checkout -b my-new-feature`)
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
 
 ## Copyright
 
@@ -130,12 +142,12 @@ the License.
 
 ## Authors
 
-***Alexander Klink***
-<secretsharing@alech.de>
-<http://www.alech.de>
-@alech on Twitter
+***Alexander Klink***  
+<secretsharing@alech.de>  
+<http://www.alech.de>  
+@alech on Twitter  
 
-***Glenn Rempe***
-<glenn@rempe.us>
-<http://www.rempe.us>
-@grempe on Twitter
+***Glenn Rempe***  
+<glenn@rempe.us>  
+<http://www.rempe.us>  
+@grempe on Twitter  
