@@ -34,13 +34,19 @@ build status is (click for details):
 
 [![Build Status](https://travis-ci.org/grempe/secretsharing.png)](https://travis-ci.org/grempe/secretsharing)
 
-## Installation Instructions
+## Installation
 
-    gem install secretsharing
+Add this line to your application's Gemfile:
 
-*or in your ````Gemfile````*
+    gem 'secretsharing'
 
-    gem "secretsharing", ">=0.3"
+And then execute:
+
+    $ bundle
+
+Or install it yourself as:
+
+    $ gem install secretsharing
 
 ## Usage
 
@@ -73,7 +79,7 @@ build status is (click for details):
     c2 << c1.shares[0]
     c2 << c1.shares[2]
     c2 << c1.shares[4]
-    
+
     c2.secret? #=> true
     puts c2.secret
 
@@ -92,6 +98,14 @@ build status is (click for details):
     # Install the gem to your local system
     # from the cloned repository code.
     rake install
+
+## Contributing
+
+1. Fork it
+2. Create your feature branch (`git checkout -b my-new-feature`)
+3. Commit your changes (`git commit -am 'Add some feature'`)
+4. Push to the branch (`git push origin my-new-feature`)
+5. Create new Pull Request
 
 ## Copyright
 

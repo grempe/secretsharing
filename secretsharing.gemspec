@@ -1,32 +1,35 @@
 # -*- encoding: utf-8 -*-
 
-$:.push File.expand_path("../lib", __FILE__)
-require "secretsharing/version"
+lib = File.expand_path('../lib', __FILE__)
+$LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
+require 'secretsharing/version'
 
 Gem::Specification.new do |s|
-  s.name        = "secretsharing"
-  s.version     = SecretSharing::VERSION
-  s.platform    = Gem::Platform::RUBY
-  s.authors     = ["Alexander Klink", "Glenn Rempe"]
-  s.email       = ["glenn@rempe.us"]
-  s.homepage    = "https://github.com/grempe/secretsharing"
-  s.summary     = %q{A Ruby Gem to enable sharing secrets using Shamirs Secret Sharing.}
+  s.name              = "secretsharing"
+  s.version           = SecretSharing::VERSION
+  s.platform          = Gem::Platform::RUBY
+  s.authors           = ["Alexander Klink", "Glenn Rempe"]
+  s.email             = ["glenn@rempe.us"]
+  s.homepage          = "https://github.com/grempe/secretsharing"
+  s.summary           = %q{A Ruby Gem to enable sharing secrets using Shamirs Secret Sharing.}
+  s.license           = "APACHE 2.0"
 
-  s.has_rdoc    = 'true'
-  s.extra_rdoc_files = ['README.md']
+  s.has_rdoc          = 'true'
+  s.extra_rdoc_files  = ['README.md']
 
   s.rubyforge_project = "secretsharing"
 
-  s.files         = `git ls-files`.split("\n")
-  s.test_files    = `git ls-files -- {spec}/*`.split("\n")
-  s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
-  s.require_paths = ["lib"]
+  s.files             = `git ls-files`.split($/)
+  s.executables       = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
+  s.test_files        = s.files.grep(%r{^(test|spec|features)/})
+  s.require_paths     = ["lib"]
 
   s.add_development_dependency 'minitest'
   s.add_development_dependency 'coco'
   s.add_development_dependency 'rb-fsevent'
   s.add_development_dependency 'rerun'
   s.add_development_dependency 'rubocop'
+  s.add_development_dependency 'bundler', '~> 1.3'
   s.add_development_dependency 'rake'
 
   s.description =<<'XEOF'
