@@ -44,7 +44,7 @@ Or install it yourself as:
 
     $ gem install secretsharing
 
-## Usage
+## Usage in a Ruby/Rails project.
 
     require 'secretsharing'
 
@@ -79,6 +79,94 @@ Or install it yourself as:
     c2.secret? #=> true
     puts c2.secret
 
+## Usage via the command line CLI
+
+First, use the `secretsharing` program to generate a set of Shares from a Secret
+
+````
+➜  secretsharing git:(master) ✗ secretsharing
+
+Shamir's Secret Sharing
+
+Would you like to 'encode' a new secret as shares, or 'decode' one from existing shares?
+1. encode
+2. decode
+Action? 1
+
+Would you like to create a 'random' secret, or will you provide a 'fixed' one?
+1. random
+2. fixed
+Type? 1
+How many total shares (n) do you want to distribute?  5
+How many of the total shares (k) are required to reveal the secret?  3
+
+========================================
+Encoded Secret:
+
+Base64 URL Safe Secret:
+Nm8zajc1MXQ2dmh1aHRranBzdDEzODVjandzMjRqY2RzZGlkMmE1Zjh4ajR4ZXhrMzc=
+
+(k) Value: 3
+(n) Value: 5
+
+Secret (Bignum):
+121034406494520178855295603459471234790779605059310221238158528187924628493811
+
+Secret (Base64 Compacted & URL Safe):
+Nm8zajc1MXQ2dmh1aHRranBzdDEzODVjandzMjRqY2RzZGlkMmE1Zjh4ajR4ZXhrMzc=
+
+Shares:
+00183DA68F032EFE2C5CE34D789D01C972DF8A20ADEA42D5FF7C783417DA2D8E36441E6B41
+0021623A956EB37FBD251D7F6CE412CD20C45C0D8CB2BF66F77F92E6159D6F68B12FD395541
+003ABD9F639A3F84C064D5DE55B5E92E5F35DCA42AD6C0EB05336E6D821EC6906BB3387A41
+00460B88B5104598F695DD040EFB36DE6BAFDD82CCEAA248A72B385890B19D9E40D1836B41
+00580D654B4D4A3874E4ED67FA1115E231B3C374B1679A885DE08C22858F7BB49257840341
+
+========================================
+➜  secretsharing git:(master) ✗
+````
+
+Once that is done you can re-hydrate your Secret using any 3 out of the 5 Shares originally generated:
+
+````
+➜  secretsharing git:(master) ✗ secretsharing
+
+Shamir's Secret Sharing
+
+Would you like to 'encode' a new secret as shares, or 'decode' one from existing shares?
+1. encode
+2. decode
+Action? 2
+
+How many of shares (k) are required to reveal this secret?  3
+
+Enter the '3' shares one at a time with a RETURN after each:
+00183DA68F032EFE2C5CE34D789D01C972DF8A20ADEA42D5FF7C783417DA2D8E36441E6B41
+003ABD9F639A3F84C064D5DE55B5E92E5F35DCA42AD6C0EB05336E6D821EC6906BB3387A41
+00580D654B4D4A3874E4ED67FA1115E231B3C374B1679A885DE08C22858F7BB49257840341
+
+
+========================================
+Decoded Secret:
+
+(k) Value: 3
+
+Secret (Bignum):
+121034406494520178855295603459471234790779605059310221238158528187924628493811
+
+Secret (Base64 Compacted & URL Safe):
+Nm8zajc1MXQ2dmh1aHRranBzdDEzODVjandzMjRqY2RzZGlkMmE1Zjh4ajR4ZXhrMzc=
+
+========================================
+➜  secretsharing git:(master) ✗
+````
+
+Easy!
+
+## Caveats & Warnings
+
+* Due to the nature of how Shamir's Secret Sharing works, it cannot tell you if a cheater has given you a Share that was not part of the original set. So if you have 2 real shares, and 1 cheater share of a valid format, the program will still generate and 'decode' a Secret.  It just won't be the *right* secret!
+
 ## Development and Testing
 
 Install the gemfile dependencies:
@@ -96,6 +184,10 @@ Or run the test suite continuously upon watched file changes:
 Build and Install the gem to your local system from the cloned repository:
 
     rake install
+
+Run the `secretsharing` binary without installing the Gem locally:
+
+    ruby -I./lib bin/secretsharing.rb
 
 ### Code Quality:
 
