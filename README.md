@@ -54,8 +54,8 @@ Or install it yourself as:
     # create a random secret (returns the secret)
     c1.secret = SecretSharing::Shamir::Secret.new
 
-    # (or create a fixed secret of your choice by passing in an OpenSSL::BN object)
-    c1.secret = SecretSharing::Shamir::Secret.new(OpenSSL::BN.new('123456789'))
+    # (or create a fixed secret of your choice by passing in an OpenSSL::BN object in the :secret arg)
+    c1.secret = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN.new('123456789'))
 
     # show secret
     puts c1.secret
