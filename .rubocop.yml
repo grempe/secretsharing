@@ -5,7 +5,7 @@ Lambda:
   Enabled: false
 
 MethodLength:
-  Max: 22
+  Max: 25
 
 ClassLength:
   Max: 125
@@ -14,4 +14,7 @@ CyclomaticComplexity:
   Max: 10
 
 HandleExceptions:
+  Enabled: false
+
+HashSyntax:
   Enabled: false
