@@ -43,7 +43,7 @@ module SecretSharing
           :secret               => get_random_number(256),
           :pbkdf2_salt          => OpenSSL::Random.random_bytes(16),
           :pbkdf2_iterations    => 20_000,
-          :pbkdf2_hash_function => OpenSSL::Digest::SHA512.new,
+          :pbkdf2_hash_function => OpenSSL::Digest::SHA512.new
         }.merge!(opts)
 
         # override with options

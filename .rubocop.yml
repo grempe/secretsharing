@@ -5,7 +5,7 @@ Lambda:
   Enabled: false
 
 MethodLength:
-  Max: 25
+  Max: 35
 
 ClassLength:
   Max: 125

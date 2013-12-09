@@ -84,7 +84,7 @@ module SecretSharing
         # You can't add more shares than were originally generated with value of @n
         fail ArgumentError, 'You have added more shares than allowed by the value of @n' if @shares.size >= @n
 
-        share = SecretSharing::Shamir::Share.new(share) unless share.is_a?(SecretSharing::Shamir::Share)
+        share = SecretSharing::Shamir::Share.new(:share => share) unless share.is_a?(SecretSharing::Shamir::Share)
         @shares << share unless @shares.include?(share)
         recover_secret
       end
@@ -112,7 +112,7 @@ module SecretSharing
         # a SecretSharing::Shamir::Share object.
         def construct_share(x, bitlength)
           p_x = evaluate_polynomial_at(x)
-          SecretSharing::Shamir::Share.new(x, p_x, @prime, bitlength)
+          SecretSharing::Shamir::Share.new(:x => x, :y => p_x, :prime => @prime, :prime_bitlength => bitlength)
         end
 
         # Evaluate the polynomial at x.

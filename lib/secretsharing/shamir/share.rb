@@ -21,40 +21,53 @@ module SecretSharing
     # a polynomial over Z/Zp, where p is a prime.
     class Share
       include SecretSharing::Shamir
-      attr_reader :x, :y, :prime, :prime_bitlength
+      attr_accessor :share, :x, :y, :prime, :prime_bitlength
 
       FORMAT_VERSION = '0'
 
       # Create a new share with the given XY point, prime and prime bitlength.
       # If a String is passed as the only arg, try to initialize this object
       # from it, assuming that it is a potential Share represented as a String.
-      def initialize(x_or_string_share = nil, y = nil, prime = nil, prime_bitlength = nil)
-        if x_or_string_share.is_a?(String) && y.nil? && prime.nil? && prime_bitlength.nil?
+      def initialize(opts = {})
+        opts = {
+          :share           => nil,
+          :x               => nil,
+          :y               => nil,
+          :prime           => nil,
+          :prime_bitlength => nil
+        }.merge!(opts)
+
+        # override with options
+        opts.each_key do |k|
+          if self.respond_to?("#{k}=")
+            send("#{k}=", opts[k])
+          else
+            fail ArgumentError, "Argument '#{k}' is not allowed"
+          end
+        end
+
+        if @share.is_a?(String)
           # Create a new share from a string format representation. For
           # a discussion of the format, see the to_s() method.
-          string            = x_or_string_share
-          @x                = string[1, 2].hex
-          p_x_str           = string[3, string.length - 9]
-          checksum          = string[-6, 4]
+          @x        = @share[1, 2].hex
+          p_x_str   = @share[3, @share.length - 9]
+          checksum  = @share[-6, 4]
 
           begin
-            @y              = OpenSSL::BN.new(p_x_str, 16)
+            @y = OpenSSL::BN.new(p_x_str, 16)
           rescue StandardError => e
             raise ArgumentError, "Could not initialize OpenSSL::BN with '#{p_x_str}' : #{e.class} : #{e.message}"
           end
 
-          validate_share_format(string)
+          validate_share_format(@share)
           validate_checksum(checksum, p_x_str)
 
-          @prime_bitlength  = 4 * string[-2, 2].hex + 1
+          @prime_bitlength = 4 * @share[-2, 2].hex + 1
           @prime = smallest_prime_of_bitlength(@prime_bitlength)
-        elsif x_or_string_share && y && prime && prime_bitlength
-          @x                = x_or_string_share
-          @y                = y
-          @prime            = prime
-          @prime_bitlength  = prime_bitlength
-        else
-          fail ArgumentError, 'A String Share, or x, y, prime, and prime_bitlength args were expected.'
+        end
+
+        if @x.nil? || @y.nil? || @prime.nil? || @prime_bitlength.nil?
+          fail ArgumentError, 'A String :share OR :x, :y, :prime, and :prime_bitlength were expected.'
         end
       end
 
