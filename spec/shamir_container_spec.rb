@@ -110,7 +110,7 @@ describe SecretSharing::Shamir::Container do
       @num_shares = 5
       @c = SecretSharing::Shamir::Container.new(@num_shares)
       @secret_num = OpenSSL::BN.new('1234567890')
-      @c.secret = SecretSharing::Shamir::Secret.new(@secret_num)
+      @c.secret = SecretSharing::Shamir::Secret.new(:secret => @secret_num, :pbkdf2_iterations => 5)
     end
 
     it 'will return true from #secret?' do
@@ -140,7 +140,7 @@ describe SecretSharing::Shamir::Container do
     end
 
     it 'must raise an exception if a secret is attempted to be set more than once' do
-      lambda { @c.secret = SecretSharing::Shamir::Secret.new }.must_raise(ArgumentError)
+      lambda { @c.secret = SecretSharing::Shamir::Secret.new(:pbkdf2_iterations => 5) }.must_raise(ArgumentError)
     end
 
   end # creating a container and setting a secret
@@ -173,9 +173,9 @@ describe SecretSharing::Shamir::Container do
 
       before do
         # set a secret on the 'creators'
-        @c1.secret  = SecretSharing::Shamir::Secret.new
-        @c3.secret  = SecretSharing::Shamir::Secret.new
-        @bad.secret = SecretSharing::Shamir::Secret.new
+        @c1.secret  = SecretSharing::Shamir::Secret.new(:pbkdf2_iterations => 5)
+        @c3.secret  = SecretSharing::Shamir::Secret.new(:pbkdf2_iterations => 5)
+        @bad.secret = SecretSharing::Shamir::Secret.new(:pbkdf2_iterations => 5)
       end
 
       it 'should be able to recover secret when k equals n and all k valid shares are provided as Shamir::Share objects' do
@@ -228,8 +228,8 @@ describe SecretSharing::Shamir::Container do
 
       before do
         # set a secret on both of the 'creators'
-        @c1.secret = SecretSharing::Shamir::Secret.new
-        @c3.secret = SecretSharing::Shamir::Secret.new
+        @c1.secret = SecretSharing::Shamir::Secret.new(:pbkdf2_iterations => 5)
+        @c3.secret = SecretSharing::Shamir::Secret.new(:pbkdf2_iterations => 5)
       end
 
       it 'should be able to recover secret when k equals n and all k shares are provided as Shamir::Share objects' do

@@ -131,7 +131,7 @@ module SecretSharing
         def recover_secret
           return false unless @shares.length >= @k
 
-          @secret = SecretSharing::Shamir::Secret.new(OpenSSL::BN.new('0'))
+          @secret = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN.new('0'))
 
           @shares.each do |share|
             l_x     = l(share.x, @shares)

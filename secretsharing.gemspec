@@ -24,6 +24,7 @@ Gem::Specification.new do |s|
   s.test_files        = s.files.grep(%r{^(test|spec|features)/})
   s.require_paths     = ["lib"]
 
+  s.add_dependency 'pbkdf2-ruby', '0.2.0'
   s.add_dependency 'highline', '~> 1.6'
 
   s.add_development_dependency 'minitest'

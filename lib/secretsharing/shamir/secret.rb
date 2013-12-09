@@ -34,25 +34,41 @@ module SecretSharing
     class Secret
       include SecretSharing::Shamir
 
-      DEFAULT_BITLENGTH = 256
-      MAX_BITLENGTH     = 4096
+      MAX_BITLENGTH = 4096
 
-      attr_reader :bitlength
-      attr_accessor :secret
+      attr_accessor :secret, :bitlength, :pbkdf2_salt, :pbkdf2_iterations, :pbkdf2_hash, :pbkdf2_hash_function
 
-      def initialize(secret = get_random_number(SecretSharing::Shamir::Secret::DEFAULT_BITLENGTH))
-        if secret.is_a?(String)
-          # Decode a Base64.urlsafe_encode64 String which contains a Base 36 encoded Bignum back into an OpenSSL::BN
-          # See : Secret#to_s for forward encoding method.
-          decoded_secret = urlsafe_decode64(secret)
-          fail ArgumentError, 'invalid base64 (returned nil or empty String)' if decoded_secret.empty?
-          secret = OpenSSL::BN.new(decoded_secret.to_i(36).to_s)
+      def initialize(opts = {})
+        opts = {
+          :secret               => get_random_number(256),
+          :pbkdf2_salt          => OpenSSL::Random.random_bytes(16),
+          :pbkdf2_iterations    => 20_000,
+          :pbkdf2_hash_function => OpenSSL::Digest::SHA512.new,
+        }.merge!(opts)
+
+        # override with options
+        opts.each_key do |k|
+          if self.respond_to?("#{k}=")
+            send("#{k}=", opts[k])
+          else
+            fail ArgumentError, "Argument '#{k}' is not allowed"
+          end
         end
 
-        @secret = secret
-        fail ArgumentError, 'Secret must be an OpenSSL::BN' unless @secret.is_a?(OpenSSL::BN)
+        if opts[:secret].is_a?(String)
+          # Decode a Base64.urlsafe_encode64 String which contains a Base 36 encoded Bignum back into an OpenSSL::BN
+          # See : Secret#to_s for forward encoding method.
+          decoded_secret = urlsafe_decode64(opts[:secret])
+          fail ArgumentError, 'invalid base64 (returned nil or empty String)' if decoded_secret.empty?
+          @secret = OpenSSL::BN.new(decoded_secret.to_i(36).to_s)
+        end
+
+        @secret = opts[:secret] if @secret.nil?
+        fail ArgumentError, "Secret must be an OpenSSL::BN, not a '#{@secret.class}'" unless @secret.is_a?(OpenSSL::BN)
         @bitlength = @secret.num_bits
         fail ArgumentError, "Secret must have a bitlength less than or equal to #{MAX_BITLENGTH}" if @bitlength > MAX_BITLENGTH
+
+        initialize_pbkdf2_hash
       end
 
       # Secrets are equal if the OpenSSL::BN in @secret is the same.
@@ -73,6 +89,20 @@ module SecretSharing
       end
 
       private
+
+        def initialize_pbkdf2_hash
+          fail ArgumentError, 'pbkdf2_salt must be set'              if @pbkdf2_salt.nil?
+          fail ArgumentError, 'pbkdf2_iterations must be set'        if @pbkdf2_iterations.nil?
+          fail ArgumentError, 'pbkdf2_iterations must be an Integer' unless @pbkdf2_iterations.is_a?(Integer)
+          fail ArgumentError, 'pbkdf2_hash_function must be set'     if @pbkdf2_hash_function.nil?
+
+          h = PBKDF2.new(:password      => @secret.to_s,
+                         :salt          => @pbkdf2_salt,
+                         :iterations    => @pbkdf2_iterations,
+                         :hash_function => @pbkdf2_hash_function)
+
+          @pbkdf2_hash = h.hex_string if h.is_a?(PBKDF2) && !h.nil?
+        end
 
         # Backported for Ruby 1.8.7, REE, JRuby, Rubinious
         def urlsafe_decode64(str)

@@ -17,6 +17,7 @@
 require 'openssl'
 require 'digest/sha1'
 require 'base64'
+require 'pbkdf2'
 
 require 'secretsharing/version'
 require 'secretsharing/shamir'
