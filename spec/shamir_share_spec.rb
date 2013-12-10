@@ -25,7 +25,7 @@ describe SecretSharing::Shamir::Share do
     end
 
     it 'will raise if an unknown option hash key is passed in' do
-      lambda { SecretSharing::Shamir::Share.new(:foo => "bar") }.must_raise(ArgumentError)
+      lambda { SecretSharing::Shamir::Share.new(:foo => 'bar') }.must_raise(ArgumentError)
     end
 
     it 'will raise when instantiated with missing args' do
