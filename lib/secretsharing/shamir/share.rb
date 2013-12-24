@@ -76,6 +76,29 @@ module SecretSharing
         usafe_encode64(to_json)
       end
 
+      # Creates the shares by computing random coefficients for a polynomial
+      # and then computing points on this polynomial.
+      def self.create_shares(k, n, secret)
+        shares                = []
+        coefficients          = []
+        coefficients[0]       = secret.secret
+
+        # round up to next nibble
+        next_nibble_bitlength = secret.bitlength + (4 - (secret.bitlength % 4))
+        prime_bitlength       = next_nibble_bitlength + 1
+        prime                 = smallest_prime_of_bitlength(prime_bitlength)
+
+        # compute random coefficients
+        (1..k - 1).each { |x| coefficients[x] = get_random_number(secret.bitlength) }
+
+        (1..n).each do |x|
+          p_x = evaluate_polynomial_at(x, coefficients, prime)
+          new_share = new(:x => x, :y => p_x, :prime => prime, :prime_bitlength => prime_bitlength, :k => k, :n => n, :hmac => secret.hmac)
+          shares[x - 1] = new_share
+        end
+        shares
+      end
+
       private
 
         def unpack_share(share)
