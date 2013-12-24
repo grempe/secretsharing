@@ -18,7 +18,6 @@ require 'openssl'
 require 'digest/sha1'
 require 'base64'
 require 'multi_json'
-require 'msgpack'
 
 require 'secretsharing/version'
 require 'secretsharing/shamir'

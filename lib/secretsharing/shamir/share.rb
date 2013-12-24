@@ -73,15 +73,14 @@ module SecretSharing
       end
 
       def to_s
-        urlsafe_encode64(to_json.to_msgpack)
+        urlsafe_encode64(to_json)
       end
 
       private
 
         def unpack_share(share)
           decoded  = urlsafe_decode64(share)
-          unpacked = MessagePack.unpack(decoded)
-          h        = MultiJson.load(unpacked, :symbolize_keys => true)
+          h        = MultiJson.load(decoded, :symbolize_keys => true)
 
           @version         = h[:version].to_i                unless h[:version].nil?
           @hmac            = h[:hmac]                        unless h[:hmac].nil?
