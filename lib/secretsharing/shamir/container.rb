@@ -132,7 +132,7 @@ module SecretSharing
           return false unless @shares.length >= @k
 
           # All Shares must have the same HMAC or they were derived from different Secrets
-          hmacs = @shares.map {|s| s.hmac}.uniq
+          hmacs = @shares.map { |s| s.hmac }.uniq
           fail ArgumentError, 'Share mismatch. Not all Shares have a common HMAC.' unless hmacs.size == 1
 
           @secret = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN.new('0'))

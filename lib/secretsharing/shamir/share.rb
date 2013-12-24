@@ -72,7 +72,7 @@ module SecretSharing
       end
 
       def to_json
-        JSON.generate(to_hash)
+        MultiJson.dump(to_hash)
       end
 
       def to_s
@@ -84,16 +84,16 @@ module SecretSharing
         def unpack_share(share)
           decoded  = urlsafe_decode64(share)
           unpacked = MessagePack.unpack(decoded)
-          h        = JSON.parse(unpacked)
+          h        = MultiJson.load(unpacked, :symbolize_keys => true)
 
-          @version         = h['version'].to_i                unless h['version'].nil?
-          @hmac            = h['hmac']                        unless h['hmac'].nil?
-          @k               = h['k'].to_i                      unless h['k'].nil?
-          @n               = h['n'].to_i                      unless h['n'].nil?
-          @x               = h['x'].to_i                      unless h['x'].nil?
-          @y               = OpenSSL::BN.new(h['y'].to_s)     unless h['y'].nil?
-          @prime           = OpenSSL::BN.new(h['prime'].to_s) unless h['prime'].nil?
-          @prime_bitlength = h['prime_bitlength'].to_i        unless h['prime_bitlength'].nil?
+          @version         = h[:version].to_i                unless h[:version].nil?
+          @hmac            = h[:hmac]                        unless h[:hmac].nil?
+          @k               = h[:k].to_i                      unless h[:k].nil?
+          @n               = h[:n].to_i                      unless h[:n].nil?
+          @x               = h[:x].to_i                      unless h[:x].nil?
+          @y               = OpenSSL::BN.new(h[:y].to_s)     unless h[:y].nil?
+          @prime           = OpenSSL::BN.new(h[:prime].to_s) unless h[:prime].nil?
+          @prime_bitlength = h[:prime_bitlength].to_i        unless h[:prime_bitlength].nil?
         end
     end # class Share
   end # module Shamir

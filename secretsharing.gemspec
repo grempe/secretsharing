@@ -25,6 +25,7 @@ Gem::Specification.new do |s|
   s.require_paths     = ["lib"]
 
   s.add_dependency 'highline', '~> 1.6'
+  s.add_dependency 'multi_json', '~> 1.8'
   s.add_dependency 'msgpack', '~> 0.5'
 
   s.add_development_dependency 'mocha'

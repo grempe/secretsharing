@@ -17,7 +17,7 @@
 require 'openssl'
 require 'digest/sha1'
 require 'base64'
-require 'json'
+require 'multi_json'
 require 'msgpack'
 
 require 'secretsharing/version'

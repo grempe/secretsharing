@@ -23,7 +23,7 @@ describe SecretSharing::Shamir do
   describe 'urlsafe_encode64 and urlsafe_decode64' do
 
     it 'will encode and decode back to the original String' do
-      str = JSON.generate(:foo => 'bar', :bar => 12_345_678_748_390_743_789).to_msgpack
+      str = MultiJson.dump(:foo => 'bar', :bar => 12_345_678_748_390_743_789).to_msgpack
       enc = urlsafe_encode64(str)
       dec = urlsafe_decode64(enc)
       dec.must_equal(str)
