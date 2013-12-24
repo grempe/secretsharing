@@ -86,7 +86,7 @@ module SecretSharing
 
         share = SecretSharing::Shamir::Share.new(:share => share) unless share.is_a?(SecretSharing::Shamir::Share)
         @shares << share unless @shares.include?(share)
-        @secret = Share.recover_secret(@shares, @secret, @k)
+        @secret = Share.recover_secret(@shares)
       end
     end # class Container
   end # module Shamir

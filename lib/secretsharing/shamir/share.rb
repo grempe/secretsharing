@@ -100,8 +100,8 @@ module SecretSharing
       end
 
       # Recover the secret by doing Lagrange interpolation.
-      def self.recover_secret(shares, secret, k)
-        return false unless shares.length >= k
+      def self.recover_secret(shares)
+        return false unless shares.length >= shares[0].k
 
         # All Shares must have the same HMAC or they were derived from different Secrets
         hmacs = shares.map { |s| s.hmac }.uniq
