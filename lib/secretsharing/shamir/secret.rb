@@ -92,7 +92,7 @@ module SecretSharing
       end
 
       def valid_hmac?
-        return false if !@secret.is_a?(OpenSSL::BN) || @hmac.nil?
+        return false if !@secret.is_a?(OpenSSL::BN) || @hmac.to_s.empty? || @secret.to_s.empty?
 
         hmac_key  = @secret.to_s
         hmac_data = OpenSSL::Digest::SHA256.new(@secret.to_s).hexdigest
@@ -106,6 +106,7 @@ module SecretSharing
         # This allows later regeneration of the HMAC to confirm that the restored secret is in fact
         # identical to what was originally split into shares.
         def generate_hmac
+          return false if @secret.to_s.empty?
           hmac_key  = @secret.to_s
           hmac_data = OpenSSL::Digest::SHA256.new(@secret.to_s).hexdigest
           @hmac     = OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA256.new, hmac_key, hmac_data)
