@@ -30,3 +30,5 @@ end
 
 require File.expand_path('../../lib/secretsharing', __FILE__)
 require 'minitest/autorun'
+require 'mocha/setup'
+

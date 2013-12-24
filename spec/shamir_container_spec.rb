@@ -194,7 +194,7 @@ describe SecretSharing::Shamir::Container do
         lambda { @c2 << @bad.shares[0] }.must_raise(ArgumentError)
       end
 
-      it 'should not be able to recover correct secret when k equals n and k-1 valid shares and 1 invalid share are provided as Shamir::Share objects' do
+      it 'should raise an ArgumentError when k equals n and k-1 valid shares and 1 invalid share are provided as Shamir::Share objects' do
         @c2 << @c1.shares[0]
         @c2 << @c1.shares[1]
         @c2 << @c1.shares[2]
@@ -203,11 +203,18 @@ describe SecretSharing::Shamir::Container do
         # with the last remaining share missing
         @c2.secret?.must_equal(false)
 
-        # with a single invalid share it will
-        # recover a secret, but it will be the *wrong* secret!
-        @c2 << @bad.shares[0]
-        @c2.secret?.must_equal(true)
-        @c2.secret.wont_equal(@c1.secret)
+        # with a bad share
+        lambda { @c2 << @bad.shares[0] }.must_raise(ArgumentError)
+      end
+
+      it 'should raise an ArgumentError if the final @secret generated does not have a valid_hmac?' do
+        # mocha instance mock using handy 'any_instance'
+        SecretSharing::Shamir::Secret.any_instance.stubs(:valid_hmac?).returns(false)
+        @c2 << @c1.shares[0]
+        @c2 << @c1.shares[1]
+        @c2 << @c1.shares[2]
+        @c2 << @c1.shares[3]
+        lambda { @c2 << @c1.shares[4] }.must_raise(ArgumentError)
       end
 
     end
