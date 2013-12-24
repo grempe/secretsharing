@@ -55,7 +55,7 @@ module SecretSharing
         if opts[:secret].is_a?(String)
           # Decode a Base64.urlsafe_encode64 String which contains a Base 36 encoded Bignum back into an OpenSSL::BN
           # See : Secret#to_s for forward encoding method.
-          decoded_secret = urlsafe_decode64(opts[:secret])
+          decoded_secret = usafe_decode64(opts[:secret])
           fail ArgumentError, 'invalid base64 (returned nil or empty String)' if decoded_secret.empty?
           @secret = OpenSSL::BN.new(decoded_secret.to_i(36).to_s)
         end
@@ -88,7 +88,7 @@ module SecretSharing
         # Convert the Bignum to a Base 36 encoded String
         # Wrap the Base 36 encoded String as a URL safe Base 64 encoded String
         # Combined this should result in a relatively compact and portable String
-        urlsafe_encode64(@secret.to_i.to_s(36))
+        usafe_encode64(@secret.to_i.to_s(36))
       end
 
       def valid_hmac?

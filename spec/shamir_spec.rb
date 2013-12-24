@@ -20,12 +20,12 @@ include SecretSharing::Shamir
 
 describe SecretSharing::Shamir do
 
-  describe 'urlsafe_encode64 and urlsafe_decode64' do
+  describe 'usafe_encode64 and usafe_decode64' do
 
     it 'will encode and decode back to the original String' do
       str = MultiJson.dump(:foo => 'bar', :bar => 12_345_678_748_390_743_789)
-      enc = urlsafe_encode64(str)
-      dec = urlsafe_decode64(enc)
+      enc = usafe_encode64(str)
+      dec = usafe_decode64(enc)
       dec.must_equal(str)
     end
 
