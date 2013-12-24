@@ -70,7 +70,7 @@ module SecretSharing
         fail ArgumentError, 'secret has already been set' if secret?
         fail ArgumentError, 'secret must be a SecretSharing::Shamir::Secret instance' unless sec.is_a?(SecretSharing::Shamir::Secret)
         @secret = sec
-        create_shares
+        @shares = create_shares(@k, @n, @secret)
         true
       end
 
@@ -93,26 +93,25 @@ module SecretSharing
 
         # Creates the shares by computing random coefficients for a polynomial
         # and then computing points on this polynomial.
-        def create_shares
-          @coefficients = []
-          @coefficients[0] = @secret.secret
+        def create_shares(k, n, secret)
+          shares                = []
+          coefficients          = []
+          coefficients[0]       = secret.secret
 
           # round up to next nibble
-          next_nibble_bitlength = @secret.bitlength + (4 - (@secret.bitlength % 4))
+          next_nibble_bitlength = secret.bitlength + (4 - (secret.bitlength % 4))
           prime_bitlength       = next_nibble_bitlength + 1
-          @prime                = smallest_prime_of_bitlength(prime_bitlength)
+          prime                 = smallest_prime_of_bitlength(prime_bitlength)
 
           # compute random coefficients
-          (1..k - 1).each { |x| @coefficients[x] = get_random_number(@secret.bitlength) }
+          (1..k - 1).each { |x| coefficients[x] = get_random_number(secret.bitlength) }
 
-          (1..n).each { |x| @shares[x - 1] = construct_share(x, prime_bitlength) }
-        end
-
-        # Construct a share by evaluating the polynomial at x and creating
-        # a SecretSharing::Shamir::Share object.
-        def construct_share(x, bitlength)
-          p_x = evaluate_polynomial_at(x, @coefficients)
-          SecretSharing::Shamir::Share.new(:x => x, :y => p_x, :prime => @prime, :prime_bitlength => bitlength, :k => @k, :n => @n, :hmac => @secret.hmac)
+          (1..n).each do |x|
+            p_x = evaluate_polynomial_at(x, coefficients, prime)
+            new_share = SecretSharing::Shamir::Share.new(:x => x, :y => p_x, :prime => prime, :prime_bitlength => prime_bitlength, :k => k, :n => n, :hmac => secret.hmac)
+            shares[x - 1] = new_share
+          end
+          shares
         end
 
         # Recover the secret by doing Lagrange interpolation.

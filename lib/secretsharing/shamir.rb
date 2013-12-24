@@ -55,12 +55,12 @@ module SecretSharing
     end
 
     # Evaluate the polynomial at x.
-    def evaluate_polynomial_at(x, coefficients)
+    def evaluate_polynomial_at(x, coefficients, prime)
       result = OpenSSL::BN.new('0')
 
-      coefficients.each_with_index do |coeff, i|
-        result += coeff * OpenSSL::BN.new(x.to_s)**i
-        result %= @prime
+      coefficients.each_with_index do |c, i|
+        result += c * OpenSSL::BN.new(x.to_s)**i
+        result %= prime
       end
 
       result
