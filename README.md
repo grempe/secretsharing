@@ -10,7 +10,7 @@ k-1 secret share holders learn nothing about the secret when they combine their 
 
 Learn More about [Shamir's Secret Sharing](http://en.wikipedia.org/wiki/Shamir's_Secret_Sharing)
 
-### Development History
+## Development History
 
 This library is based on the OpenXPKI::Crypto::Secret::Split Perl module
 used in the open source PKI software OpenXPKI, which was written by
@@ -21,10 +21,14 @@ can be found at <http://repo.or.cz/w/secretsharing.git>
 
 It has been further enhanced, modularized, and a full test suite
 has been added by Glenn Rempe (<glenn@rempe.us>) and can be found
-at <https://github.com/grempe/secretsharing>. The public API of
-this new Gem is *not* backwards compatible with 'secretsharing' <= '0.3'.
+at <https://github.com/grempe/secretsharing> which is the new canonical
+repository for the gem.
 
-## Is it ready?
+WARNING : The public API and the Share String format of the current version
+of the Gem are *not* backwards compatible with 'secretsharing'
+versions <= '0.3'.
+
+## Should I use it?
 
 This code has not yet been tested in production.  It is seemingly well tested though with a full Minitest suite and 100% test code coverage and appears to be working well for what it was designed to do.  The code also undergoes a continuous integration test run on many different Ruby runtimes upon every push.
 
@@ -60,9 +64,6 @@ Or install it yourself as:
     # show secret
     puts c1.secret
 
-    # show password representation of secret (Base64)
-    puts c1.secret.to_base64
-
     # show shares
     c1.shares.each { |share| puts share }
 
@@ -78,6 +79,10 @@ Or install it yourself as:
 
     c2.secret? #=> true
     puts c2.secret
+    
+    # Test that the secret used to generate the HMAC
+    # matches the HMAC of the secret that was re-constructed
+    c2.secret.valid_hmac? #=> true
 
 ## Usage via the command line CLI
 
@@ -103,24 +108,28 @@ How many of the total shares (k) are required to reveal the secret?  3
 ========================================
 Encoded Secret:
 
-Base64 URL Safe Secret:
-Nm8zajc1MXQ2dmh1aHRranBzdDEzODVjandzMjRqY2RzZGlkMmE1Zjh4ajR4ZXhrMzc=
-
 (k) Value: 3
 (n) Value: 5
 
 Secret (Bignum):
-121034406494520178855295603459471234790779605059310221238158528187924628493811
+179040077567401061920833455639501686558874997550289562553628622313673068089718
 
 Secret (Base64 Compacted & URL Safe):
-Nm8zajc1MXQ2dmh1aHRranBzdDEzODVjandzMjRqY2RzZGlkMmE1Zjh4ajR4ZXhrMzc=
+OXY1eHdod3N0NXJ1MWEzZXBuMjgxZnN1Y2Y4dXI1bWRyNG40dTl2Zmk1MG16OXM4emE=
+
+Secret has valid_hmac?
+true
 
 Shares:
-00183DA68F032EFE2C5CE34D789D01C972DF8A20ADEA42D5FF7C783417DA2D8E36441E6B41
-0021623A956EB37FBD251D7F6CE412CD20C45C0D8CB2BF66F77F92E6159D6F68B12FD395541
-003ABD9F639A3F84C064D5DE55B5E92E5F35DCA42AD6C0EB05336E6D821EC6906BB3387A41
-00460B88B5104598F695DD040EFB36DE6BAFDD82CCEAA248A72B385890B19D9E40D1836B41
-00580D654B4D4A3874E4ED67FA1115E231B3C374B1679A885DE08C22858F7BB49257840341
+2gEqeyJobWFjIjoiMDVkNWNlOTIyNjk5ZTUxNzY4ODU2MmJlYjJiZDUzMTI4OTAyYTYzMjAxMjIxMjdjZTVhZjhlMmRiMmY2MmNkMiIsImsiOjMsIm4iOjUsInByaW1lIjozNzA1MzQ2ODU1NTk0MTE4MjUzNTU0MjcxNTIwMjc4MDEzMDUxMzA0NjM5NTA5MzAwNDk4MDQ5MjYyNjQyNjg4MjUzMjIwMTQ4NDc4MDU5LCJwcmltZV9iaXRsZW5ndGgiOjI2MSwidmVyc2lvbiI6MSwieCI6MSwieSI6OTE5NjU5ODE1Njg0MzAwODU5Mjg2OTU1ODMxMzg0NzA2NDQ1NTMyMzQxNDE5ODAyOTA5NzEwMDcxODU1MTgwMjUyMTYxMjk4Nzg0MzE2fQ==
+
+2gEreyJobWFjIjoiMDVkNWNlOTIyNjk5ZTUxNzY4ODU2MmJlYjJiZDUzMTI4OTAyYTYzMjAxMjIxMjdjZTVhZjhlMmRiMmY2MmNkMiIsImsiOjMsIm4iOjUsInByaW1lIjozNzA1MzQ2ODU1NTk0MTE4MjUzNTU0MjcxNTIwMjc4MDEzMDUxMzA0NjM5NTA5MzAwNDk4MDQ5MjYyNjQyNjg4MjUzMjIwMTQ4NDc4MDU5LCJwcmltZV9iaXRsZW5ndGgiOjI2MSwidmVyc2lvbiI6MSwieCI6MiwieSI6MjI4MDcyMTc2NjA0NjUwODgwODE1ODY0MTc2ODQyOTY5NDkwODgyODY1OTY4Mzg4MzYyODAyNTE0NTI5MzI4NTE1NDI3Njg3NjM0ODkyNn0=
+
+2gEqeyJobWFjIjoiMDVkNWNlOTIyNjk5ZTUxNzY4ODU2MmJlYjJiZDUzMTI4OTAyYTYzMjAxMjIxMjdjZTVhZjhlMmRiMmY2MmNkMiIsImsiOjMsIm4iOjUsInByaW1lIjozNzA1MzQ2ODU1NTk0MTE4MjUzNTU0MjcxNTIwMjc4MDEzMDUxMzA0NjM5NTA5MzAwNDk4MDQ5MjYyNjQyNjg4MjUzMjIwMTQ4NDc4MDU5LCJwcmltZV9iaXRsZW5ndGgiOjI2MSwidmVyc2lvbiI6MSwieCI6MywieSI6NTU2ODc5MDczMDU5OTA2NjU0OTgxNjE5NzQ2NDk2NDU0MDI1MTQzMTkwMjgwNDkxOTQ2NDU4NTExMzAwMjQ4NzY2Nzk5NjUyMzA1NDg5fQ==
+
+2gEreyJobWFjIjoiMDVkNWNlOTIyNjk5ZTUxNzY4ODU2MmJlYjJiZDUzMTI4OTAyYTYzMjAxMjIxMjdjZTVhZjhlMmRiMmY2MmNkMiIsImsiOjMsIm4iOjUsInByaW1lIjozNzA1MzQ2ODU1NTk0MTE4MjUzNTU0MjcxNTIwMjc4MDEzMDUxMzA0NjM5NTA5MzAwNDk4MDQ5MjYyNjQyNjg4MjUzMjIwMTQ4NDc4MDU5LCJwcmltZV9iaXRsZW5ndGgiOjI2MSwidmVyc2lvbiI6MSwieCI6NCwieSI6MzE1ODgyNTQ0NzkxMjczMDkwNjg2NDQzMjgwNjE0MTAwOTg5NzA4NTIxMjIyODIyODg2MTEwODY5NTE2MTQ0NzU5NjE2OTkyMzYxMDEyM30=
+
+2gEreyJobWFjIjoiMDVkNWNlOTIyNjk5ZTUxNzY4ODU2MmJlYjJiZDUzMTI4OTAyYTYzMjAxMjIxMjdjZTVhZjhlMmRiMmY2MmNkMiIsImsiOjMsIm4iOjUsInByaW1lIjozNzA1MzQ2ODU1NTk0MTE4MjUzNTU0MjcxNTIwMjc4MDEzMDUxMzA0NjM5NTA5MzAwNDk4MDQ5MjYyNjQyNjg4MjUzMjIwMTQ4NDc4MDU5LCJwcmltZV9iaXRsZW5ndGgiOjI2MSwidmVyc2lvbiI6MSwieCI6NSwieSI6MjY3NTg2NzE3OTQxNjc0NTA1NjY5ODUzNzkwNjgwNzMzNjQyMjA0NTQ0NjUwODQ5MzM3NTg3NzE3MTU5MTUwNTEzNTk0NzM5MzMwNjcxMH0=
 
 ========================================
 ➜  secretsharing git:(master) ✗
@@ -141,9 +150,9 @@ Action? 2
 How many of shares (k) are required to reveal this secret?  3
 
 Enter the '3' shares one at a time with a RETURN after each:
-00183DA68F032EFE2C5CE34D789D01C972DF8A20ADEA42D5FF7C783417DA2D8E36441E6B41
-003ABD9F639A3F84C064D5DE55B5E92E5F35DCA42AD6C0EB05336E6D821EC6906BB3387A41
-00580D654B4D4A3874E4ED67FA1115E231B3C374B1679A885DE08C22858F7BB49257840341
+2gEqeyJobWFjIjoiMDVkNWNlOTIyNjk5ZTUxNzY4ODU2MmJlYjJiZDUzMTI4OTAyYTYzMjAxMjIxMjdjZTVhZjhlMmRiMmY2MmNkMiIsImsiOjMsIm4iOjUsInByaW1lIjozNzA1MzQ2ODU1NTk0MTE4MjUzNTU0MjcxNTIwMjc4MDEzMDUxMzA0NjM5NTA5MzAwNDk4MDQ5MjYyNjQyNjg4MjUzMjIwMTQ4NDc4MDU5LCJwcmltZV9iaXRsZW5ndGgiOjI2MSwidmVyc2lvbiI6MSwieCI6MSwieSI6OTE5NjU5ODE1Njg0MzAwODU5Mjg2OTU1ODMxMzg0NzA2NDQ1NTMyMzQxNDE5ODAyOTA5NzEwMDcxODU1MTgwMjUyMTYxMjk4Nzg0MzE2fQ==
+2gEreyJobWFjIjoiMDVkNWNlOTIyNjk5ZTUxNzY4ODU2MmJlYjJiZDUzMTI4OTAyYTYzMjAxMjIxMjdjZTVhZjhlMmRiMmY2MmNkMiIsImsiOjMsIm4iOjUsInByaW1lIjozNzA1MzQ2ODU1NTk0MTE4MjUzNTU0MjcxNTIwMjc4MDEzMDUxMzA0NjM5NTA5MzAwNDk4MDQ5MjYyNjQyNjg4MjUzMjIwMTQ4NDc4MDU5LCJwcmltZV9iaXRsZW5ndGgiOjI2MSwidmVyc2lvbiI6MSwieCI6MiwieSI6MjI4MDcyMTc2NjA0NjUwODgwODE1ODY0MTc2ODQyOTY5NDkwODgyODY1OTY4Mzg4MzYyODAyNTE0NTI5MzI4NTE1NDI3Njg3NjM0ODkyNn0=
+2gEqeyJobWFjIjoiMDVkNWNlOTIyNjk5ZTUxNzY4ODU2MmJlYjJiZDUzMTI4OTAyYTYzMjAxMjIxMjdjZTVhZjhlMmRiMmY2MmNkMiIsImsiOjMsIm4iOjUsInByaW1lIjozNzA1MzQ2ODU1NTk0MTE4MjUzNTU0MjcxNTIwMjc4MDEzMDUxMzA0NjM5NTA5MzAwNDk4MDQ5MjYyNjQyNjg4MjUzMjIwMTQ4NDc4MDU5LCJwcmltZV9iaXRsZW5ndGgiOjI2MSwidmVyc2lvbiI6MSwieCI6MywieSI6NTU2ODc5MDczMDU5OTA2NjU0OTgxNjE5NzQ2NDk2NDU0MDI1MTQzMTkwMjgwNDkxOTQ2NDU4NTExMzAwMjQ4NzY2Nzk5NjUyMzA1NDg5fQ==
 
 
 ========================================
@@ -152,20 +161,17 @@ Decoded Secret:
 (k) Value: 3
 
 Secret (Bignum):
-121034406494520178855295603459471234790779605059310221238158528187924628493811
+179040077567401061920833455639501686558874997550289562553628622313673068089718
 
 Secret (Base64 Compacted & URL Safe):
-Nm8zajc1MXQ2dmh1aHRranBzdDEzODVjandzMjRqY2RzZGlkMmE1Zjh4ajR4ZXhrMzc=
+OXY1eHdod3N0NXJ1MWEzZXBuMjgxZnN1Y2Y4dXI1bWRyNG40dTl2Zmk1MG16OXM4emE=
+
 
 ========================================
 ➜  secretsharing git:(master) ✗
 ````
 
 Easy!
-
-## Caveats & Warnings
-
-* Due to the nature of how Shamir's Secret Sharing works, it cannot tell you if a cheater has given you a Share that was not part of the original set. So if you have 2 real shares, and 1 cheater share of a valid format, the program will still generate and 'decode' a Secret.  It just won't be the *right* secret!
 
 ## Development and Testing
 
@@ -187,7 +193,7 @@ Build and Install the gem to your local system from the cloned repository:
 
 Run the `secretsharing` binary without installing the Gem locally:
 
-    ruby -I./lib bin/secretsharing.rb
+    ruby -I./lib bin/secretsharing
 
 ### Code Quality:
 
@@ -248,7 +254,7 @@ This Gem, and its version number, tries its best to adhere to the
 
 ### Copyright
 
-(c) 2010-2013 Alexander Klink and Glenn Rempe
+(c) 2010-2014 Alexander Klink and Glenn Rempe
 
 ### License
 
@@ -269,12 +275,12 @@ the License.
 
 ## Authors
 
-***Alexander Klink***  
-<secretsharing@alech.de>  
-<http://www.alech.de>  
-@alech on Twitter  
+***Alexander Klink***</br>
+<secretsharing@alech.de></br>
+<http://www.alech.de></br>
+@alech on Twitter</br>
 
-***Glenn Rempe***  
-<glenn@rempe.us>  
-<http://www.rempe.us>  
-@grempe on Twitter  
+***Glenn Rempe***</br>
+<glenn@rempe.us></br>
+<http://www.rempe.us></br>
+@grempe on Twitter</br>

@@ -21,20 +21,21 @@ module SecretSharing
     # a polynomial over Z/Zp, where p is a prime.
     class Share
       include SecretSharing::Shamir
-      attr_accessor :share, :x, :y, :prime, :prime_bitlength, :version
+      attr_accessor :share, :version, :hmac, :k, :n, :x, :y, :prime, :prime_bitlength
 
-      # Create a new share with the given XY point, prime and prime bitlength.
       def initialize(opts = {})
         opts = {
           :share           => nil,
+          :version         => 1,
+          :hmac            => nil,
+          :k               => nil,
+          :n               => nil,
           :x               => nil,
           :y               => nil,
           :prime           => nil,
           :prime_bitlength => nil,
-          :version         => 0
         }.merge!(opts)
 
-        # override with options
         opts.each_key do |k|
           if self.respond_to?("#{k}=")
             send("#{k}=", opts[k])
@@ -43,82 +44,56 @@ module SecretSharing
           end
         end
 
-        parse_share if @share.is_a?(String) && !@share.empty?
+        # Decode and unpack a String share if provided
+        unpack_share(@share) unless @share.nil?
 
-        if @x.nil? || @y.nil? || @prime.nil? || @prime_bitlength.nil?
-          fail ArgumentError, 'A String :share OR :x, :y, :prime, and :prime_bitlength were expected.'
+        if @share.nil?
+          errors = [:version, :hmac, :k, :n, :x, :y, :prime, :prime_bitlength].map { |e| e if send("#{e}").nil? }.compact
+          fail ArgumentError, "#{errors.join(', ')} expected." unless errors.empty?
         end
       end
 
-      def to_s
-        generate_share
-      end
-
-      # Shares are equal if their string representation is the same.
       def ==(other)
         other.to_s == to_s
       end
 
+      def to_hash
+        hash = [:version, :hmac, :k, :n, :x, :y, :prime, :prime_bitlength].reduce({}) do |h, element|
+          if [:hmac].include?(element)
+            h.merge(element => send(element))
+          else
+            # everything else is an Integer/Bignum
+            h.merge(element => send(element).to_i)
+          end
+        end
+
+        # Order the hash by key
+        Hash[hash.sort]
+      end
+
+      def to_json
+        JSON.generate(to_hash)
+      end
+
+      def to_s
+        urlsafe_encode64(to_json.to_msgpack)
+      end
+
       private
 
-        def parse_share
-          # Create a new share from a string format representation. For
-          # a discussion of the format, see the to_s() method.
-          @x        = @share[1, 2].hex
-          p_x_str   = @share[3, @share.length - 9]
-          checksum  = @share[-6, 4]
+        def unpack_share(share)
+          decoded  = urlsafe_decode64(share)
+          unpacked = MessagePack.unpack(decoded)
+          h        = JSON.parse(unpacked)
 
-          begin
-            @y = OpenSSL::BN.new(p_x_str, 16)
-          rescue StandardError => e
-            raise ArgumentError, "Could not initialize OpenSSL::BN with '#{p_x_str}' : #{e.class} : #{e.message}"
-          end
-
-          validate_share_version
-          validate_checksum(checksum, p_x_str)
-
-          @prime_bitlength = 4 * @share[-2, 2].hex + 1
-          @prime = smallest_prime_of_bitlength(@prime_bitlength)
-        end
-
-        # A string representation of the share, that can for example be
-        # distributed in printed form.
-        #
-        # The string is an uppercase hexadecimal string of the following
-        # format: ABBC*DDDDEEEE, where:
-        #
-        # * A (the first nibble) is the version number of the format, currently fixed to 0.
-        # * B (the next byte, two hex characters) is the x coordinate of the point on the polynomial.
-        # * C (the next variable length of bytes) is the y coordinate of the point on the polynomial.
-        # * D (the next two bytes, four hex characters) is the two highest
-        #   bytes of the SHA1 hash on the string representing the y coordinate,
-        #   it is used as a checksum to guard against typos
-        # * E (the next two bytes, four hex characters) is the bitlength of the
-        #   prime number in nibbles.
-        def generate_share
-          # bitlength in nibbles to save space
-          prime_nibbles = (@prime_bitlength - 1) / 4
-          p_x = sprintf('%x', @y).upcase
-
-          share = ''
-          share << @version.to_s
-          share << sprintf('%02x', @x)
-          share << p_x
-          share << Digest::SHA1.hexdigest(p_x)[0, 4]
-          share << sprintf('%02x', prime_nibbles)
-          share.upcase
-        end
-
-        def validate_share_version
-          version = @share[0, 1]
-          fail "Invalid share format version # '#{version}', expected '0'" if version != '0'
-        end
-
-        def validate_checksum(checksum, p_x_str)
-          computed_checksum = Digest::SHA1.hexdigest(p_x_str)[0, 4].upcase
-          if checksum != computed_checksum
-            fail "Invalid checksum. Expected #{computed_checksum}, got #{checksum}"
-          end
+          @version         = h['version'].to_i                unless h['version'].nil?
+          @hmac            = h['hmac']                        unless h['hmac'].nil?
+          @k               = h['k'].to_i                      unless h['k'].nil?
+          @n               = h['n'].to_i                      unless h['n'].nil?
+          @x               = h['x'].to_i                      unless h['x'].nil?
+          @y               = OpenSSL::BN.new(h['y'].to_s)     unless h['y'].nil?
+          @prime           = OpenSSL::BN.new(h['prime'].to_s) unless h['prime'].nil?
+          @prime_bitlength = h['prime_bitlength'].to_i        unless h['prime_bitlength'].nil?
         end
     end # class Share
   end # module Shamir

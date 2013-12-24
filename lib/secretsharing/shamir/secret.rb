@@ -36,14 +36,11 @@ module SecretSharing
 
       MAX_BITLENGTH = 4096
 
-      attr_accessor :secret, :bitlength, :pbkdf2_salt, :pbkdf2_iterations, :pbkdf2_hash, :pbkdf2_hash_function
+      attr_accessor :secret, :bitlength, :hmac
 
       def initialize(opts = {})
         opts = {
-          :secret               => get_random_number(256),
-          :pbkdf2_salt          => OpenSSL::Random.random_bytes(16),
-          :pbkdf2_iterations    => 20_000,
-          :pbkdf2_hash_function => OpenSSL::Digest::SHA512.new
+          :secret => get_random_number(256)
         }.merge!(opts)
 
         # override with options
@@ -68,12 +65,18 @@ module SecretSharing
         @bitlength = @secret.num_bits
         fail ArgumentError, "Secret must have a bitlength less than or equal to #{MAX_BITLENGTH}" if @bitlength > MAX_BITLENGTH
 
-        initialize_pbkdf2_hash
+        generate_hmac
       end
 
       # Secrets are equal if the OpenSSL::BN in @secret is the same.
       def ==(other)
         other == @secret
+      end
+
+      # Set a new secret forces regeneration of the HMAC
+      def secret=(secret)
+        @secret = secret
+        generate_hmac
       end
 
       def secret?
@@ -88,37 +91,24 @@ module SecretSharing
         urlsafe_encode64(@secret.to_i.to_s(36))
       end
 
+      def valid_hmac?
+        return false if !@secret.is_a?(OpenSSL::BN) || @hmac.nil?
+
+        hmac_key  = @secret.to_s
+        hmac_data = OpenSSL::Digest::SHA256.new(@secret.to_s).hexdigest
+
+        @hmac == OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA256.new, hmac_key, hmac_data)
+      end
+
       private
 
-        def initialize_pbkdf2_hash
-          fail ArgumentError, 'pbkdf2_salt must be set'              if @pbkdf2_salt.nil?
-          fail ArgumentError, 'pbkdf2_iterations must be set'        if @pbkdf2_iterations.nil?
-          fail ArgumentError, 'pbkdf2_iterations must be an Integer' unless @pbkdf2_iterations.is_a?(Integer)
-          fail ArgumentError, 'pbkdf2_hash_function must be set'     if @pbkdf2_hash_function.nil?
-
-          h = PBKDF2.new(:password      => @secret.to_s,
-                         :salt          => @pbkdf2_salt,
-                         :iterations    => @pbkdf2_iterations,
-                         :hash_function => @pbkdf2_hash_function)
-
-          @pbkdf2_hash = h.hex_string if h.is_a?(PBKDF2) && !h.nil?
-        end
-
-        # Backported for Ruby 1.8.7, REE, JRuby, Rubinious
-        def urlsafe_decode64(str)
-          return Base64.urlsafe_decode64(str) if Base64.respond_to?(:urlsafe_decode64)
-
-          if str.include?('\n')
-            fail(ArgumentError, 'invalid base64')
-          else
-            Base64.decode64(str)
-          end
-        end
-
-        # Backported for Ruby 1.8.7, REE, JRuby, Rubinious
-        def urlsafe_encode64(bin)
-          return Base64.urlsafe_encode64(bin) if Base64.respond_to?(:urlsafe_encode64)
-          Base64.encode64(bin).tr("\n", '')
+        # The HMAC uses the raw secret itself as the HMAC key, and the SHA256 of the secret as the data.
+        # This allows later regeneration of the HMAC to confirm that the restored secret is in fact
+        # identical to what was originally split into shares.
+        def generate_hmac
+          hmac_key  = @secret.to_s
+          hmac_data = OpenSSL::Digest::SHA256.new(@secret.to_s).hexdigest
+          @hmac     = OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA256.new, hmac_key, hmac_data)
         end
     end # class Secret
   end # module Shamir

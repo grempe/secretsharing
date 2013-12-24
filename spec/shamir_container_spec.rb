@@ -110,7 +110,7 @@ describe SecretSharing::Shamir::Container do
       @num_shares = 5
       @c = SecretSharing::Shamir::Container.new(@num_shares)
       @secret_num = OpenSSL::BN.new('1234567890')
-      @c.secret = SecretSharing::Shamir::Secret.new(:secret => @secret_num, :pbkdf2_iterations => 5)
+      @c.secret = SecretSharing::Shamir::Secret.new(:secret => @secret_num)
     end
 
     it 'will return true from #secret?' do
@@ -140,7 +140,7 @@ describe SecretSharing::Shamir::Container do
     end
 
     it 'must raise an exception if a secret is attempted to be set more than once' do
-      lambda { @c.secret = SecretSharing::Shamir::Secret.new(:pbkdf2_iterations => 5) }.must_raise(ArgumentError)
+      lambda { @c.secret = SecretSharing::Shamir::Secret.new }.must_raise(ArgumentError)
     end
 
   end # creating a container and setting a secret
@@ -157,25 +157,13 @@ describe SecretSharing::Shamir::Container do
       @bad = SecretSharing::Shamir::Container.new(5, 3) # a bad actor
     end
 
-    describe 'with invalid shares' do
-
-      it 'should raise an exception when passed a simple Integer' do
-        lambda { @c2 << 1 }.must_raise(ArgumentError)
-      end
-
-      it 'should raise an exception when passed a simple String that is not of the expected format' do
-        lambda { @c2 << 'a' }.must_raise(ArgumentError)
-      end
-
-    end
-
     describe 'with a mix of valid and invalid shares' do
 
       before do
         # set a secret on the 'creators'
-        @c1.secret  = SecretSharing::Shamir::Secret.new(:pbkdf2_iterations => 5)
-        @c3.secret  = SecretSharing::Shamir::Secret.new(:pbkdf2_iterations => 5)
-        @bad.secret = SecretSharing::Shamir::Secret.new(:pbkdf2_iterations => 5)
+        @c1.secret  = SecretSharing::Shamir::Secret.new
+        @c3.secret  = SecretSharing::Shamir::Secret.new
+        @bad.secret = SecretSharing::Shamir::Secret.new
       end
 
       it 'should be able to recover secret when k equals n and all k valid shares are provided as Shamir::Share objects' do
@@ -228,8 +216,8 @@ describe SecretSharing::Shamir::Container do
 
       before do
         # set a secret on both of the 'creators'
-        @c1.secret = SecretSharing::Shamir::Secret.new(:pbkdf2_iterations => 5)
-        @c3.secret = SecretSharing::Shamir::Secret.new(:pbkdf2_iterations => 5)
+        @c1.secret = SecretSharing::Shamir::Secret.new
+        @c3.secret = SecretSharing::Shamir::Secret.new
       end
 
       it 'should be able to recover secret when k equals n and all k shares are provided as Shamir::Share objects' do
@@ -257,7 +245,7 @@ describe SecretSharing::Shamir::Container do
         # with the last remaining share missing
         @c2.secret?.must_equal(false)
 
-        @c2 << @c1.shares[4]
+        @c2 << @c1.shares[4].to_s
 
         # with the final share provided
         @c2.secret?.must_equal(true)

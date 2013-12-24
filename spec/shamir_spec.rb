@@ -14,14 +14,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-require 'openssl'
-require 'digest/sha1'
-require 'base64'
-require 'json'
-require 'msgpack'
+require File.expand_path('../spec_helper', __FILE__)
 
-require 'secretsharing/version'
-require 'secretsharing/shamir'
-require 'secretsharing/shamir/container'
-require 'secretsharing/shamir/share'
-require 'secretsharing/shamir/secret'
+include SecretSharing::Shamir
+
+describe SecretSharing::Shamir do
+
+  describe 'urlsafe_encode64 and urlsafe_decode64' do
+
+    it 'will encode and decode back to the original String' do
+      str = JSON.generate(:foo => 'bar', :bar => 12_345_678_748_390_743_789).to_msgpack
+      enc = urlsafe_encode64(str)
+      dec = urlsafe_decode64(enc)
+      dec.must_equal(str)
+    end
+
+  end
+
+end

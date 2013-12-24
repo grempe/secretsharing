@@ -3,4 +3,4 @@ source "https://rubygems.org"
 gem 'rake'
 gem 'minitest'
 gem 'highline'
-gem 'pbkdf2-ruby'
+gem 'msgpack'

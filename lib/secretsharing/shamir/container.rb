@@ -112,7 +112,7 @@ module SecretSharing
         # a SecretSharing::Shamir::Share object.
         def construct_share(x, bitlength)
           p_x = evaluate_polynomial_at(x)
-          SecretSharing::Shamir::Share.new(:x => x, :y => p_x, :prime => @prime, :prime_bitlength => bitlength)
+          SecretSharing::Shamir::Share.new(:x => x, :y => p_x, :prime => @prime, :prime_bitlength => bitlength, :k => @k, :n => @n, :hmac => @secret.hmac)
         end
 
         # Evaluate the polynomial at x.
