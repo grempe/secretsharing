@@ -151,23 +151,6 @@ module SecretSharing
             fail ArgumentError, 'Secret recovery failure. The generated Secret does not match the HMACs in the Shares provided.'
           end
         end
-
-        # Part of the Lagrange interpolation.
-        # This is l_j(0), i.e.
-        # \prod_{x_j \neq x_i} \frac{-x_i}{x_j - x_i}
-        # for more information compare Wikipedia:
-        # http://en.wikipedia.org/wiki/Lagrange_form
-        def l(x, shares)
-          result = shares.select { |s| s.x != x }
-
-          result = result.map do |s|
-            minus_xi = OpenSSL::BN.new((-s.x).to_s)
-            one_over_xj_minus_xi = OpenSSL::BN.new((x - s.x).to_s).mod_inverse(shares[0].prime)
-            minus_xi.mod_mul(one_over_xj_minus_xi, shares[0].prime)
-          end
-
-          (result.reduce { |a, e| a.mod_mul(e, shares[0].prime) })
-        end
     end # class Container
   end # module Shamir
 end # module SecretSharing

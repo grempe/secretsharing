@@ -54,6 +54,23 @@ module SecretSharing
       test_prime
     end
 
+    # Part of the Lagrange interpolation.
+    # This is l_j(0), i.e.
+    # \prod_{x_j \neq x_i} \frac{-x_i}{x_j - x_i}
+    # for more information compare Wikipedia:
+    # http://en.wikipedia.org/wiki/Lagrange_form
+    def l(x, shares)
+      result = shares.select { |s| s.x != x }
+
+      result = result.map do |s|
+        minus_xi = OpenSSL::BN.new((-s.x).to_s)
+        one_over_xj_minus_xi = OpenSSL::BN.new((x - s.x).to_s).mod_inverse(shares[0].prime)
+        minus_xi.mod_mul(one_over_xj_minus_xi, shares[0].prime)
+      end
+
+      (result.reduce { |a, e| a.mod_mul(e, shares[0].prime) })
+    end
+
     # Backported for Ruby 1.8.7, REE, JRuby, Rubinious
     def usafe_decode64(str)
       return Base64.urlsafe_decode64(str) if Base64.respond_to?(:urlsafe_decode64)
