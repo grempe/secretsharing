@@ -54,6 +54,18 @@ module SecretSharing
       test_prime
     end
 
+    # Evaluate the polynomial at x.
+    def evaluate_polynomial_at(x, coefficients)
+      result = OpenSSL::BN.new('0')
+
+      coefficients.each_with_index do |coeff, i|
+        result += coeff * OpenSSL::BN.new(x.to_s)**i
+        result %= @prime
+      end
+
+      result
+    end
+
     # Part of the Lagrange interpolation.
     # This is l_j(0), i.e.
     # \prod_{x_j \neq x_i} \frac{-x_i}{x_j - x_i}

@@ -111,20 +111,8 @@ module SecretSharing
         # Construct a share by evaluating the polynomial at x and creating
         # a SecretSharing::Shamir::Share object.
         def construct_share(x, bitlength)
-          p_x = evaluate_polynomial_at(x)
+          p_x = evaluate_polynomial_at(x, @coefficients)
           SecretSharing::Shamir::Share.new(:x => x, :y => p_x, :prime => @prime, :prime_bitlength => bitlength, :k => @k, :n => @n, :hmac => @secret.hmac)
-        end
-
-        # Evaluate the polynomial at x.
-        def evaluate_polynomial_at(x)
-          result = OpenSSL::BN.new('0')
-
-          @coefficients.each_with_index do |coeff, i|
-            result += coeff * OpenSSL::BN.new(x.to_s)**i
-            result %= @prime
-          end
-
-          result
         end
 
         # Recover the secret by doing Lagrange interpolation.
