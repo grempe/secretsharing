@@ -58,7 +58,7 @@ module SecretSharing
       end
 
       def to_hash
-        hash = [:version, :hmac, :k, :n, :x, :y, :prime, :prime_bitlength].reduce({}) do |h, element|
+        [:version, :hmac, :k, :n, :x, :y, :prime, :prime_bitlength].reduce({}) do |h, element|
           if [:hmac].include?(element)
             h.merge(element => send(element))
           else
@@ -66,9 +66,6 @@ module SecretSharing
             h.merge(element => send(element).to_i)
           end
         end
-
-        # Order the hash by key
-        Hash[hash.sort]
       end
 
       def to_json
