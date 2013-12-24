@@ -99,6 +99,31 @@ module SecretSharing
         shares
       end
 
+      # Recover the secret by doing Lagrange interpolation.
+      def self.recover_secret(shares, secret, k)
+        return false unless shares.length >= k
+
+        # All Shares must have the same HMAC or they were derived from different Secrets
+        hmacs = shares.map { |s| s.hmac }.uniq
+        fail ArgumentError, 'Share mismatch. Not all Shares have a common HMAC.' unless hmacs.size == 1
+
+        secret = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN.new('0'))
+
+        shares.each do |share|
+          l_x     = l(share.x, shares)
+          summand = share.y * l_x
+          summand %= share.prime
+          secret.secret += summand
+          secret.secret %= share.prime
+        end
+
+        if secret && secret.is_a?(SecretSharing::Shamir::Secret) && secret.valid_hmac?
+          return secret
+        else
+          fail ArgumentError, 'Secret recovery failure. The generated Secret does not match the HMACs in the Shares provided.'
+        end
+      end
+
       private
 
         def unpack_share(share)
