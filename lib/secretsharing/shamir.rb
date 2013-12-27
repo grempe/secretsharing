@@ -71,16 +71,17 @@ module SecretSharing
     # \prod_{x_j \neq x_i} \frac{-x_i}{x_j - x_i}
     # for more information compare Wikipedia:
     # http://en.wikipedia.org/wiki/Lagrange_form
-    def l(x, shares)
-      result = shares.select { |s| s.x != x }
+    def lagrange(x, shares)
+      prime        = shares.first.prime
+      other_shares = shares.reject { |s| s.x == x }
 
-      result = result.map do |s|
-        minus_xi = OpenSSL::BN.new((-s.x).to_s)
-        one_over_xj_minus_xi = OpenSSL::BN.new((x - s.x).to_s).mod_inverse(shares[0].prime)
-        minus_xi.mod_mul(one_over_xj_minus_xi, shares[0].prime)
+      results = other_shares.map do |s|
+        minus_xi = OpenSSL::BN.new("#{-s.x}")
+        one_over_xj_minus_xi = OpenSSL::BN.new("#{x - s.x}").mod_inverse(prime)
+        minus_xi.mod_mul(one_over_xj_minus_xi, prime)
       end
 
-      (result.reduce { |a, e| a.mod_mul(e, shares[0].prime) })
+      results.reduce { |a, e| a.mod_mul(e, prime) }
     end
 
     # Backported for Ruby 1.8.7, REE, JRuby, Rubinious

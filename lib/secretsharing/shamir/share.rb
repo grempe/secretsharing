@@ -110,7 +110,7 @@ module SecretSharing
         secret = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN.new('0'))
 
         shares.each do |share|
-          l_x     = l(share.x, shares)
+          l_x     = lagrange(share.x, shares)
           summand = share.y * l_x
           summand %= share.prime
           secret.secret += summand
