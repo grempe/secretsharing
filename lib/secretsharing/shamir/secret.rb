@@ -34,9 +34,13 @@ module SecretSharing
     class Secret
       include SecretSharing::Shamir
 
+# FIXME : Is a MAX_BITLENGTH really needed?  Can it be larger if so?
+
       MAX_BITLENGTH = 4096
 
       attr_accessor :secret, :bitlength, :hmac
+
+# FIXME : allow instantiating a secret with any random number bitlength you choose.
 
       def initialize(opts = {})
         opts = {
@@ -51,6 +55,9 @@ module SecretSharing
             fail ArgumentError, "Argument '#{k}' is not allowed"
           end
         end
+
+# FIXME : Do we really need the ability for a String arg to re-instantiate a Secret?
+# FIXME : If its a String, shouldn't it be able to be an arbitrary String converted to/from OpenSSL::BN?
 
         if opts[:secret].is_a?(String)
           # Decode a Base64.urlsafe_encode64 String which contains a Base 36 encoded Bignum back into an OpenSSL::BN

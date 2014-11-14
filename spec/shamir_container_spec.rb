@@ -145,6 +145,48 @@ describe SecretSharing::Shamir::Container do
 
   end # creating a container and setting a secret
 
+  describe 'generating shares when a secret is provided' do
+
+    it 'should generate unique shares for the min number of shares and a tiny secret' do
+      c1 = SecretSharing::Shamir::Container.new(2)
+      c1.secret  = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN.new('123'))
+      shares = c1.shares
+      shares.size.must_equal(2)
+      uniq_shares = shares.uniq
+      shares.must_equal(uniq_shares)
+    end
+
+    it 'should generate unique shares for the max number of shares and a tiny secret' do
+      c1 = SecretSharing::Shamir::Container.new(512)
+      c1.secret  = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN.new('123'))
+      shares = c1.shares
+      shares.size.must_equal(512)
+      uniq_shares = shares.uniq
+      shares.must_equal(uniq_shares)
+    end
+
+    it 'should generate unique shares for the min number of shares and a large secret' do
+      c1 = SecretSharing::Shamir::Container.new(2)
+# FIXME : Major Perf Issue : If OpenSSL::BN::rand(512) is given with 4096 instead of 512 this takes FOREVER
+      c1.secret  = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN::rand(512))
+      shares = c1.shares
+      shares.size.must_equal(2)
+      uniq_shares = shares.uniq
+      shares.must_equal(uniq_shares)
+    end
+
+    it 'should generate unique shares for the max number of shares and a large secret' do
+      c1 = SecretSharing::Shamir::Container.new(512)
+# FIXME : Major Perf Issue : If OpenSSL::BN::rand(512) is given with 4096 instead of 512 this takes FOREVER
+      c1.secret  = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN::rand(512))
+      shares = c1.shares
+      shares.size.must_equal(512)
+      uniq_shares = shares.uniq
+      shares.must_equal(uniq_shares)
+    end
+
+  end
+
   describe 'recovering a secret from a container' do
 
     before do

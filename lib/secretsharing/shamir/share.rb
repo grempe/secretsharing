@@ -57,6 +57,9 @@ module SecretSharing
         other.to_s == to_s
       end
 
+# FIXME : Add an HMAC which 'signs' all of the attributes of the hash and which gets verified on re-hydration to make sure
+# that none of the attributes changed?
+
       def to_hash
         [:version, :hmac, :k, :n, :x, :y, :prime, :prime_bitlength].reduce({}) do |h, element|
           if [:hmac].include?(element)
@@ -86,7 +89,15 @@ module SecretSharing
         # round up to next nibble
         next_nibble_bitlength = secret.bitlength + (4 - (secret.bitlength % 4))
         prime_bitlength       = next_nibble_bitlength + 1
-        prime                 = smallest_prime_of_bitlength(prime_bitlength)
+        prime                 = OpenSSL::BN::generate_prime(prime_bitlength)
+
+# FIXME ^^^ : Why does generate_prime always return 35879 for bitlength 1-15
+# OpenSSL::BN::generate_prime(1).to_i
+# => 35879
+# Do we need to make sure that prime_bitlength is not shorter than 64 bits?
+# See : https://www.mail-archive.com/openssl-dev@openssl.org/msg18835.html
+# See : http://ardoino.com/2005/11/maths-openssl-primes-random/
+# See : http://www.openssl.org/docs/apps/genrsa.html  "Therefore the number of bits should not be less that 64."
 
         # compute random coefficients
         (1..k - 1).each { |x| coefficients[x] = get_random_number(secret.bitlength) }
@@ -110,7 +121,7 @@ module SecretSharing
         secret = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN.new('0'))
 
         shares.each do |share|
-          l_x     = lagrange(share.x, shares)
+          l_x = lagrange(share.x, shares)
           summand = share.y * l_x
           summand %= share.prime
           secret.secret += summand

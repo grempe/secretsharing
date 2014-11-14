@@ -17,6 +17,9 @@
 module SecretSharing
   # Module for common methods shared across Container, Secret, or Share
   module Shamir
+
+# FIXME : Needs focused tests
+
     # Creates a random number of a certain bitlength, optionally ensuring
     # the bitlength by setting the highest bit to 1.
     def get_random_number(bitlength)
@@ -35,24 +38,7 @@ module SecretSharing
       rand
     end
 
-    # Computes the smallest prime of a given bitlength. Uses prime_fasttest
-    # from the OpenSSL library with 20 attempts to be compatible to openssl
-    # prime, which is used in the OpenXPKI::Crypto::Secret::Split library.
-    def smallest_prime_of_bitlength(bitlength)
-      # start with 2^bit_length + 1
-      test_prime = OpenSSL::BN.new((2**bitlength + 1).to_s)
-      prime_found = false
-
-      until prime_found
-        # prime_fasttest? 20 do be compatible to
-        # openssl prime, which is used in
-        # OpenXPKI::Crypto::Secret::Split
-        prime_found = test_prime.prime_fasttest?(20)
-        test_prime += 2
-      end
-
-      test_prime
-    end
+# FIXME : Needs focused tests
 
     # Evaluate the polynomial at x.
     def evaluate_polynomial_at(x, coefficients, prime)
@@ -65,6 +51,8 @@ module SecretSharing
 
       result
     end
+
+# FIXME : Needs focused tests
 
     # Part of the Lagrange interpolation.
     # This is l_j(0), i.e.
@@ -84,8 +72,11 @@ module SecretSharing
       results.reduce { |a, e| a.mod_mul(e, prime) }
     end
 
+# FIXME : Needs focused tests
+
     # Backported for Ruby 1.8.7, REE, JRuby, Rubinious
     def usafe_decode64(str)
+      str = str.strip
       return Base64.urlsafe_decode64(str) if Base64.respond_to?(:urlsafe_decode64)
 
       if str.include?('\n')
@@ -95,8 +86,11 @@ module SecretSharing
       end
     end
 
+# FIXME : Needs focused tests
+
     # Backported for Ruby 1.8.7, REE, JRuby, Rubinious
     def usafe_encode64(bin)
+      bin = bin.strip
       return Base64.urlsafe_encode64(bin) if Base64.respond_to?(:urlsafe_encode64)
       Base64.encode64(bin).tr("\n", '')
     end
