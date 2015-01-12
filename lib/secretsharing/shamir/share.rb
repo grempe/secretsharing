@@ -86,7 +86,7 @@ module SecretSharing
         # round up to next nibble
         next_nibble_bitlength = secret.bitlength + (4 - (secret.bitlength % 4))
         prime_bitlength       = next_nibble_bitlength + 1
-        prime                 = smallest_prime_of_bitlength(prime_bitlength)
+        prime                 = OpenSSL::BN.generate_prime(prime_bitlength)
 
         # compute random coefficients
         (1..k - 1).each { |x| coefficients[x] = get_random_number(secret.bitlength) }
