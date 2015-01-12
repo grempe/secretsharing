@@ -21,6 +21,7 @@ module SecretSharing
     # a polynomial over Z/Zp, where p is a prime.
     class Share
       include SecretSharing::Shamir
+      extend SecretSharing::Shamir
       attr_accessor :share, :version, :hmac, :k, :n, :x, :y, :prime, :prime_bitlength
 
       def initialize(opts = {})
