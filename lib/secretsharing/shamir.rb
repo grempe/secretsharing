@@ -35,25 +35,6 @@ module SecretSharing
       rand
     end
 
-    # Computes the smallest prime of a given bitlength. Uses prime_fasttest
-    # from the OpenSSL library with 20 attempts to be compatible to openssl
-    # prime, which is used in the OpenXPKI::Crypto::Secret::Split library.
-    def smallest_prime_of_bitlength(bitlength)
-      # start with 2^bit_length + 1
-      test_prime = OpenSSL::BN.new((2**bitlength + 1).to_s)
-      prime_found = false
-
-      until prime_found
-        # prime_fasttest? 20 do be compatible to
-        # openssl prime, which is used in
-        # OpenXPKI::Crypto::Secret::Split
-        prime_found = test_prime.prime_fasttest?(20)
-        test_prime += 2
-      end
-
-      test_prime
-    end
-
     # Evaluate the polynomial at x.
     def evaluate_polynomial_at(x, coefficients, prime)
       result = OpenSSL::BN.new('0')
