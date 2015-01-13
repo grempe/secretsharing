@@ -254,7 +254,7 @@ This Gem, and its version number, tries its best to adhere to the
 
 ### Copyright
 
-(c) 2010-2014 Alexander Klink and Glenn Rempe
+(c) 2010-2015 Alexander Klink and Glenn Rempe
 
 ### License
 
