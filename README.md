@@ -79,7 +79,7 @@ Or install it yourself as:
 
     c2.secret? #=> true
     puts c2.secret
-    
+
     # Test that the secret used to generate the HMAC
     # matches the HMAC of the secret that was re-constructed
     c2.secret.valid_hmac? #=> true

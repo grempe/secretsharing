@@ -22,7 +22,7 @@ Bundler.setup
 begin
   require 'coco'
 rescue LoadError
-  # Don't blow up with coco isn't available.
+  # Don't blow up if coco isn't available.
   # It won't install on MRI Ruby < 1.9.2 or
   # other platforms. It is not installed
   # in the Travis CI build environment.

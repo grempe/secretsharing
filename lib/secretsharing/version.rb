@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+# Module for specifying the current version of the gem.
 module SecretSharing
   VERSION = '0.3'
 end

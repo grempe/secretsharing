@@ -13,8 +13,17 @@ ClassLength:
 CyclomaticComplexity:
   Max: 10
 
+PerceivedComplexity:
+  Max: 10
+
 HandleExceptions:
   Enabled: false
 
 HashSyntax:
   Enabled: false
+
+AbcSize:
+  Enabled: false
+
+GuardClause:
+  MinBodyLength: 5

@@ -25,7 +25,7 @@ Gem::Specification.new do |s|
   s.require_paths     = ["lib"]
 
   s.add_dependency 'highline', '~> 1.6'
-  s.add_dependency 'multi_json', '~> 1.8'
+  s.add_dependency 'multi_json', '~> 1.10'
 
   s.add_development_dependency 'mocha'
   s.add_development_dependency 'minitest'
@@ -33,8 +33,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rb-fsevent'
   s.add_development_dependency 'rerun'
   s.add_development_dependency 'rubocop'
-  s.add_development_dependency 'bundler', '~> 1.3'
-  s.add_development_dependency 'rake'
+  s.add_development_dependency 'bundler', '~> 1.7'
+  s.add_development_dependency 'rake', '~> 10.4'
 
   s.description =<<'XEOF'
 Shamir's Secret Sharing is an algorithm in cryptography. It is a

@@ -17,9 +17,7 @@
 module SecretSharing
   # Module for common methods shared across Container, Secret, or Share
   module Shamir
-
-# FIXME : Needs focused tests
-
+    # FIXME : Needs focused tests
     # Creates a random number of a certain bitlength, optionally ensuring
     # the bitlength by setting the highest bit to 1.
     def get_random_number(bitlength)
@@ -38,7 +36,7 @@ module SecretSharing
       rand
     end
 
-# FIXME : Needs focused tests
+    # FIXME : Needs focused tests
 
     # Evaluate the polynomial at x.
     def evaluate_polynomial_at(x, coefficients, prime)
@@ -52,7 +50,7 @@ module SecretSharing
       result
     end
 
-# FIXME : Needs focused tests
+    # FIXME : Needs focused tests
 
     # Part of the Lagrange interpolation.
     # This is l_j(0), i.e.
@@ -72,7 +70,7 @@ module SecretSharing
       results.reduce { |a, e| a.mod_mul(e, prime) }
     end
 
-# FIXME : Needs focused tests
+    # FIXME : Needs focused tests
 
     # Backported for Ruby 1.8.7, REE, JRuby, Rubinious
     def usafe_decode64(str)
@@ -86,7 +84,7 @@ module SecretSharing
       end
     end
 
-# FIXME : Needs focused tests
+    # FIXME : Needs focused tests
 
     # Backported for Ruby 1.8.7, REE, JRuby, Rubinious
     def usafe_encode64(bin)
