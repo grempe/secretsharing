@@ -16,11 +16,12 @@
 
 require File.expand_path('../spec_helper', __FILE__)
 
-include SecretSharing::Shamir
 
 describe SecretSharing::Shamir do
 
   describe 'usafe_encode64 and usafe_decode64' do
+
+    include SecretSharing::Shamir
 
     it 'will encode and decode back to the original String' do
       str = MultiJson.dump(:foo => 'bar', :bar => 12_345_678_748_390_743_789)
