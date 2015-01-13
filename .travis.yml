@@ -3,7 +3,7 @@ language: ruby
 gemfile: gemfiles/Gemfile.ci
 
 rvm:
-  - ruby-head
+  - 2.2.0
   - 2.1.5
   - 2.0.0
   - 1.9.3
@@ -12,5 +12,5 @@ rvm:
   - jruby-head
   - jruby-19mode
   - jruby-18mode
-  - rbx-2.1.1
+  - rbx-2.4.1
   - ree

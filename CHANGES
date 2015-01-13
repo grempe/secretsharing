@@ -1,3 +1,10 @@
+== v1.0.0
+   Version 1.0.0 is an almost complete rewrite of the original code.
+   This version is NOT backwards compatible with the shares generated
+   with previous version. The API for this version is significantly
+   changed as well. You will need to make some (hopefully simple)
+   code changes to use this newer version. See the README.md file
+   for details.
 == v0.3
    Added support for setting your own secret using the set_fixed_secret()
    method.
@@ -8,4 +15,3 @@
 
 == v0.1
    Initial version
-
