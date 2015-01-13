@@ -264,6 +264,7 @@ describe SecretSharing::Shamir::Container do
     describe 'with valid shares resulting from a random secret' do
 
       before do
+        extend SecretSharing::Shamir
         # set a secret on both of the 'creators'
         @c1.secret = SecretSharing::Shamir::Secret.new
         @c3.secret = SecretSharing::Shamir::Secret.new
