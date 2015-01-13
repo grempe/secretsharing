@@ -269,6 +269,23 @@ describe SecretSharing::Shamir::Container do
         @c3.secret = SecretSharing::Shamir::Secret.new
       end
 
+      # This exposed a bug in the prime number generation; for instance 4*8
+      # passes.
+      it 'should be able to recover secret with a bitlength of 5*8' do
+        secret = SecretSharing::Shamir::Secret.new(:secret => get_random_number(5*8))
+        c = SecretSharing::Shamir::Container.new(4,2)
+        c.secret = secret
+
+        (0...4).to_a.permutation(2).collect{|e| e.sort}.uniq.each do |indexes|
+          c2 = SecretSharing::Shamir::Container.new(2)
+          indexes.each do |index|
+            c2 << c.shares[index]
+          end
+          c2.secret?.must_equal(true)
+          c2.secret.must_equal(c.secret)
+        end
+      end
+
       it 'should be able to recover secret when k equals n and all k shares are provided as Shamir::Share objects' do
         @c2 << @c1.shares[0]
         @c2 << @c1.shares[1]
