@@ -24,6 +24,8 @@ Gem::Specification.new do |s|
   s.test_files        = s.files.grep(%r{^(test|spec|features)/})
   s.require_paths     = ["lib"]
 
+  s.add_dependency 'rbnacl-libsodium', '~> 1.0.3'
+  s.add_dependency 'rbnacl', '~> 3.2.0'
   s.add_dependency 'highline', '~> 1.6'
   s.add_dependency 'multi_json', '~> 1.10'
 

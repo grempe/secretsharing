@@ -22,8 +22,8 @@ module SecretSharing
     # the bitlength by setting the highest bit to 1.
     def get_random_number(bitlength)
       byte_length = (bitlength / 8.0).ceil
-      rand_hex    = OpenSSL::Random.random_bytes(byte_length).each_byte.to_a.map { |a| sprintf('%02x', a) }.join('')
-      rand        = OpenSSL::BN.new(rand_hex, 16)
+      rand_hex = RbNaCl::Util.bin2hex(RbNaCl::Random.random_bytes(byte_length))
+      rand = OpenSSL::BN.new(rand_hex, 16)
 
       begin
         rand.mask_bits!(bitlength)

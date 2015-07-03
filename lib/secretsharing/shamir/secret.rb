@@ -98,25 +98,33 @@ module SecretSharing
         usafe_encode64(@secret.to_i.to_s(36))
       end
 
+      # See : generate_hmac
       def valid_hmac?
         return false if !@secret.is_a?(OpenSSL::BN) || @hmac.to_s.empty? || @secret.to_s.empty?
-
-        hmac_key  = @secret.to_s
-        hmac_data = OpenSSL::Digest::SHA256.new(@secret.to_s).hexdigest
-
-        @hmac == OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA256.new, hmac_key, hmac_data)
+        hash = RbNaCl::Hash.sha512(@secret.to_s)
+        key = hash[0,32]
+        authenticator = RbNaCl::Util.hex2bin(@hmac)
+        msg = hash[33,64]
+        begin
+          RbNaCl::HMAC::SHA256.verify(key, authenticator, msg)
+        rescue Exception => e
+          false
+        end
       end
 
       private
 
-      # The HMAC uses the raw secret itself as the HMAC key, and the SHA256 of the secret as the data.
-      # This allows later regeneration of the HMAC to confirm that the restored secret is in fact
-      # identical to what was originally split into shares.
+      # SHA512 over @secret returns a 64 Byte array. Use the first 32 bytes
+      # as the HMAC key, and the last 32 bytes as the message.
+      #
+      # This will allow a point of comparison between the original secret that
+      # was split into shares, and the secret that was retrieved by combining shares.
       def generate_hmac
         return false if @secret.to_s.empty?
-        hmac_key  = @secret.to_s
-        hmac_data = OpenSSL::Digest::SHA256.new(@secret.to_s).hexdigest
-        @hmac     = OpenSSL::HMAC.hexdigest(OpenSSL::Digest::SHA256.new, hmac_key, hmac_data)
+        hash = RbNaCl::Hash.sha512(@secret.to_s)
+        key = hash[0,32]
+        msg = hash[33,64]
+        @hmac = RbNaCl::Util.bin2hex(RbNaCl::HMAC::SHA256.auth(key, msg))
       end
     end # class Secret
   end # module Shamir
