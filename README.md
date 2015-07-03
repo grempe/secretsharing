@@ -89,7 +89,7 @@ Or install it yourself as:
 First, use the `secretsharing` program to generate a set of Shares from a Secret
 
 ````
-➜  secretsharing git:(master) ✗ secretsharing
+$ secretsharing
 
 Shamir's Secret Sharing
 
@@ -132,13 +132,12 @@ Shares:
 2gEreyJobWFjIjoiMDVkNWNlOTIyNjk5ZTUxNzY4ODU2MmJlYjJiZDUzMTI4OTAyYTYzMjAxMjIxMjdjZTVhZjhlMmRiMmY2MmNkMiIsImsiOjMsIm4iOjUsInByaW1lIjozNzA1MzQ2ODU1NTk0MTE4MjUzNTU0MjcxNTIwMjc4MDEzMDUxMzA0NjM5NTA5MzAwNDk4MDQ5MjYyNjQyNjg4MjUzMjIwMTQ4NDc4MDU5LCJwcmltZV9iaXRsZW5ndGgiOjI2MSwidmVyc2lvbiI6MSwieCI6NSwieSI6MjY3NTg2NzE3OTQxNjc0NTA1NjY5ODUzNzkwNjgwNzMzNjQyMjA0NTQ0NjUwODQ5MzM3NTg3NzE3MTU5MTUwNTEzNTk0NzM5MzMwNjcxMH0=
 
 ========================================
-➜  secretsharing git:(master) ✗
 ````
 
 Once that is done you can re-hydrate your Secret using any 3 out of the 5 Shares originally generated:
 
 ````
-➜  secretsharing git:(master) ✗ secretsharing
+$ secretsharing
 
 Shamir's Secret Sharing
 
@@ -168,7 +167,6 @@ OXY1eHdod3N0NXJ1MWEzZXBuMjgxZnN1Y2Y4dXI1bWRyNG40dTl2Zmk1MG16OXM4emE=
 
 
 ========================================
-➜  secretsharing git:(master) ✗
 ````
 
 Easy!
