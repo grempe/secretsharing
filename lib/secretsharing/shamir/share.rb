@@ -90,22 +90,20 @@ module SecretSharing
         # round up to next nibble
         next_nibble_bitlength = secret.bitlength + (4 - (secret.bitlength % 4))
         prime_bitlength       = next_nibble_bitlength + 1
-        prime                 = OpenSSL::BN.generate_prime(prime_bitlength)
-
-        # FIXME : Why does generate_prime always return 35879 for bitlength 1-15
-        # OpenSSL::BN::generate_prime(1).to_i
-        # => 35879
-        # Do we need to make sure that prime_bitlength is not shorter than 64 bits?
-        # See : https://www.mail-archive.com/openssl-dev@openssl.org/msg18835.html
-        # See : http://ardoino.com/2005/11/maths-openssl-primes-random/
-        # See : http://www.openssl.org/docs/apps/genrsa.html  "Therefore the number of bits should not be less that 64."
+        prime                 = get_prime_number(prime_bitlength)
 
         # compute random coefficients
         (1..k - 1).each { |x| coefficients[x] = get_random_number(secret.bitlength) }
 
         (1..n).each do |x|
           p_x = evaluate_polynomial_at(x, coefficients, prime)
-          new_share = new(:x => x, :y => p_x, :prime => prime, :prime_bitlength => prime_bitlength, :k => k, :n => n, :hmac => secret.hmac)
+          new_share = new(:x => x,
+                          :y => p_x,
+                          :prime => prime,
+                          :prime_bitlength => prime_bitlength,
+                          :k => k,
+                          :n => n,
+                          :hmac => secret.hmac)
           shares[x - 1] = new_share
         end
         shares

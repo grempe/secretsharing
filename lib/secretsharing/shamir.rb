@@ -17,7 +17,7 @@
 module SecretSharing
   # Module for common methods shared across Container, Secret, or Share
   module Shamir
-    # FIXME : Needs focused tests
+
     # Creates a random number of a certain bitlength, optionally ensuring
     # the bitlength by setting the highest bit to 1.
     def get_random_number(bitlength)
@@ -34,6 +34,23 @@ module SecretSharing
 
       rand.set_bit!(bitlength)
       rand
+    end
+
+    # Creates a random prime number of *at least* bitlength
+    def get_prime_number(bitlength)
+      # FIXME : bignum problem : another way to generate large primes?
+      # BN_generate_prime_ex() generates a pseudo-random prime number of ***at least*** bit length bits. If ret is not NULL, it will be used to store the number.
+      # https://wiki.openssl.org/index.php/Manual:BN_generate_prime(3)
+
+      # FIXME : Why does generate_prime always return 35879 for bitlength 1-15
+      # OpenSSL::BN::generate_prime(1).to_i
+      # => 35879
+      # Do we need to make sure that prime_bitlength is not shorter than 64 bits?
+      # See : https://www.mail-archive.com/openssl-dev@openssl.org/msg18835.html
+      # See : http://ardoino.com/2005/11/maths-openssl-primes-random/
+      # See : http://www.openssl.org/docs/apps/genrsa.html  "Therefore the number of bits should not be less that 64."
+
+      OpenSSL::BN.generate_prime(bitlength)
     end
 
     # FIXME : Needs focused tests
