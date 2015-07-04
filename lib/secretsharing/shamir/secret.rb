@@ -44,7 +44,7 @@ module SecretSharing
 
       def initialize(opts = {})
         opts = {
-          :secret => get_random_number(256)
+          :secret => get_random_number(256) # 32 Bytes
         }.merge!(opts)
 
         # override with options

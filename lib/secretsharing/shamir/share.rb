@@ -85,13 +85,13 @@ module SecretSharing
         coefficients          = []
         coefficients[0]       = secret.secret
 
-        # round up to next nibble
+        # compute random coefficients
+        (1..k - 1).each { |x| coefficients[x] = get_random_number(secret.bitlength) }
+
+        # Round up to the next nibble (half-byte)
         next_nibble_bitlength = secret.bitlength + (4 - (secret.bitlength % 4))
         prime_bitlength       = next_nibble_bitlength + 1
         prime                 = get_prime_number(prime_bitlength)
-
-        # compute random coefficients
-        (1..k - 1).each { |x| coefficients[x] = get_random_number(secret.bitlength) }
 
         (1..n).each do |x|
           p_x = evaluate_polynomial_at(x, coefficients, prime)
