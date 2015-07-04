@@ -69,7 +69,11 @@ module SecretSharing
 
         @secret = opts[:secret] if @secret.nil?
         fail ArgumentError, "Secret must be an OpenSSL::BN, not a '#{@secret.class}'" unless @secret.is_a?(OpenSSL::BN)
-        @bitlength = @secret.num_bits
+
+        # Get the number of binary bits in this secret's value.
+        # by converting to a Base2 string (binary) and getting length.
+        # FIXME : should not need to to_i coercion, but currently used OpenSSL::BN doesn't support .to_s(2)
+        @bitlength = @secret.to_i.to_s(2).length
         fail ArgumentError, "Secret must have a bitlength less than or equal to #{MAX_BITLENGTH}" if @bitlength > MAX_BITLENGTH
 
         generate_hmac
