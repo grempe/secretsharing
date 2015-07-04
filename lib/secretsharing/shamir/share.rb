@@ -58,15 +58,13 @@ module SecretSharing
         other.to_s == to_s
       end
 
-      # FIXME : Add an HMAC which 'signs' all of the attributes of the hash and which gets verified on re-hydration to make sure
-      # that none of the attributes changed?
-
       def to_hash
         [:version, :hmac, :k, :n, :x, :y, :prime, :prime_bitlength].reduce({}) do |h, element|
           if [:hmac].include?(element)
+            # hmac value is a String
             h.merge(element => send(element))
           else
-            # everything else is an Integer/Bignum
+            # everything else can be coerced to an Integer
             h.merge(element => send(element).to_i)
           end
         end
@@ -113,9 +111,11 @@ module SecretSharing
       def self.recover_secret(shares)
         return false unless shares.length >= shares[0].k
 
-        # All Shares must have the same HMAC or they were derived from different Secrets
+        # All Shares must have the same HMAC if derived from same Secret
         hmacs = shares.map(&:hmac).uniq
-        fail ArgumentError, 'Share mismatch. Not all Shares have a common HMAC.' unless hmacs.size == 1
+        unless hmacs.size == 1
+          fail ArgumentError, 'Share mismatch. Not all Shares have a common HMAC.'
+        end
 
         secret = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN.new('0'))
 
