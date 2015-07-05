@@ -21,14 +21,13 @@ module SecretSharing
     # argument when creating a new SecretSharing::Shamir::Container or
     # can be the output from a Container that has successfully decoded shares.
     # A new Secret take 0 or 1 args. Zero args means the Secret will be initialized
-    # with a random OpenSSL::BN object with the Secret::DEFAULT_BITLENGTH. If a
-    # single argument is passed it can be one of two object types, String or
-    # OpenSSL::BN.  If a String it is expected to be a specially encoded String
+    # with a random Numeric object with the Secret::DEFAULT_BITLENGTH. If a
+    # single argument is passed it can be a String, Integer, or OpenSSL::BN.
+    # If its a String, its expected to be of a special encoding
     # that was generated as the output of calling #to_s on another Secret object.
-    # If the object type is OpenSSL::BN it can represent a number up to 4096 num_bits
-    # in length as reported by OpenSSL::BN#num_bits.
+    # If the object type is an Integer it can be up to 4096 bits in length.
     #
-    # All secrets are internally represented as an OpenSSL::BN which can be retrieved
+    # All secrets are internally represented as a Numeric which can be retrieved
     # in its raw form using #secret.
     #
     class Secret
@@ -44,7 +43,7 @@ module SecretSharing
 
       def initialize(opts = {})
         opts = {
-          :secret => get_random_number(256) # 32 Bytes
+          :secret => get_random_number(32) # Bytes
         }.merge!(opts)
 
         # override with options
@@ -57,29 +56,33 @@ module SecretSharing
         end
 
         # FIXME : Do we really need the ability for a String arg to re-instantiate a Secret?
-        # FIXME : If its a String, shouldn't it be able to be an arbitrary String converted to/from OpenSSL::BN?
+        # FIXME : If its a String, shouldn't it be able to be an arbitrary String converted to/from a Number?
 
         if opts[:secret].is_a?(String)
-          # Decode a Base64.urlsafe_encode64 String which contains a Base 36 encoded Bignum back into an OpenSSL::BN
+          # Decode a Base64.urlsafe_encode64 String which contains a Base 36 encoded Bignum back into a Bignum
           # See : Secret#to_s for forward encoding method.
           decoded_secret = usafe_decode64(opts[:secret])
           fail ArgumentError, 'invalid base64 (returned nil or empty String)' if decoded_secret.empty?
-          @secret = OpenSSL::BN.new(decoded_secret.to_i(36).to_s)
+          @secret = decoded_secret.to_i(36)
         end
 
         @secret = opts[:secret] if @secret.nil?
-        fail ArgumentError, "Secret must be an OpenSSL::BN, not a '#{@secret.class}'" unless @secret.is_a?(OpenSSL::BN)
+        fail ArgumentError, "Secret must be an Integer or OpenSSL::BN, not a '#{@secret.class}'" unless @secret.is_a?(Integer) || @secret.is_a?(OpenSSL::BN)
+
+        # Normalize all secrets to a Numeric
+        if @secret.is_a?(OpenSSL::BN)
+          @secret = @secret.to_i
+        end
 
         # Get the number of binary bits in this secret's value.
-        # by converting to a Base2 string (binary) and getting length.
-        # FIXME : should not need to to_i coercion, but currently used OpenSSL::BN doesn't support .to_s(2)
-        @bitlength = @secret.to_i.to_s(2).length
+        @bitlength = @secret.bit_length
+
         fail ArgumentError, "Secret must have a bitlength less than or equal to #{MAX_BITLENGTH}" if @bitlength > MAX_BITLENGTH
 
         generate_hmac
       end
 
-      # Secrets are equal if the OpenSSL::BN in @secret is the same.
+      # Secrets are equal if the Numeric in @secret is the same.
       def ==(other)
         other == @secret
       end
@@ -91,20 +94,19 @@ module SecretSharing
       end
 
       def secret?
-        @secret.is_a?(OpenSSL::BN)
+        @secret.is_a?(Integer)
       end
 
       def to_s
-        # Convert the OpenSSL::BN secret to an Bignum which has a #to_s(36) method
         # Convert the Bignum to a Base 36 encoded String
         # Wrap the Base 36 encoded String as a URL safe Base 64 encoded String
         # Combined this should result in a relatively compact and portable String
-        usafe_encode64(@secret.to_i.to_s(36))
+        usafe_encode64(@secret.to_s(36))
       end
 
       # See : generate_hmac
       def valid_hmac?
-        return false if !@secret.is_a?(OpenSSL::BN) || @hmac.to_s.empty? || @secret.to_s.empty?
+        return false if !@secret.is_a?(Integer) || @hmac.to_s.empty? || @secret.to_s.empty?
         hash = RbNaCl::Hash.sha512(@secret.to_s)
         key = hash[0,32]
         authenticator = RbNaCl::Util.hex2bin(@hmac)

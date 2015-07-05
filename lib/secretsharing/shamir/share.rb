@@ -86,7 +86,7 @@ module SecretSharing
         coefficients[0]       = secret.secret
 
         # compute random coefficients
-        (1..k - 1).each { |x| coefficients[x] = get_random_number(secret.bitlength) }
+        (1..k - 1).each { |x| coefficients[x] = get_random_number_with_bitlength(secret.bitlength) }
 
         # Round up to the next nibble (half-byte)
         next_nibble_bitlength = secret.bitlength + (4 - (secret.bitlength % 4))
@@ -117,7 +117,7 @@ module SecretSharing
           fail ArgumentError, 'Share mismatch. Not all Shares have a common HMAC.'
         end
 
-        secret = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN.new('0'))
+        secret = SecretSharing::Shamir::Secret.new(:secret => 0)
 
         shares.each do |share|
           l_x = lagrange(share.x, shares)
@@ -145,8 +145,8 @@ module SecretSharing
         @k               = h[:k].to_i                      unless h[:k].nil?
         @n               = h[:n].to_i                      unless h[:n].nil?
         @x               = h[:x].to_i                      unless h[:x].nil?
-        @y               = OpenSSL::BN.new(h[:y].to_s)     unless h[:y].nil?
-        @prime           = OpenSSL::BN.new(h[:prime].to_s) unless h[:prime].nil?
+        @y               = h[:y].to_i                      unless h[:y].nil?
+        @prime           = h[:prime].to_i                  unless h[:prime].nil?
         @prime_bitlength = h[:prime_bitlength].to_i        unless h[:prime_bitlength].nil?
       end
     end # class Share

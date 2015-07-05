@@ -109,7 +109,7 @@ describe SecretSharing::Shamir::Container do
     before do
       @num_shares = 5
       @c = SecretSharing::Shamir::Container.new(@num_shares)
-      @secret_num = OpenSSL::BN.new('1234567890')
+      @secret_num = 1234567890
       @c.secret = SecretSharing::Shamir::Secret.new(:secret => @secret_num)
     end
 
@@ -149,7 +149,7 @@ describe SecretSharing::Shamir::Container do
 
     it 'should generate unique shares for the min number of shares and a tiny secret' do
       c1 = SecretSharing::Shamir::Container.new(2)
-      c1.secret  = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN.new('123'))
+      c1.secret  = SecretSharing::Shamir::Secret.new(:secret => 123)
       shares = c1.shares
       shares.size.must_equal(2)
       uniq_shares = shares.uniq
@@ -158,7 +158,7 @@ describe SecretSharing::Shamir::Container do
 
     it 'should generate unique shares for the max number of shares and a tiny secret' do
       c1 = SecretSharing::Shamir::Container.new(512)
-      c1.secret  = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN.new('123'))
+      c1.secret  = SecretSharing::Shamir::Secret.new(:secret => 123)
       shares = c1.shares
       shares.size.must_equal(512)
       uniq_shares = shares.uniq
@@ -167,8 +167,9 @@ describe SecretSharing::Shamir::Container do
 
     it 'should generate unique shares for the min number of shares and a large secret' do
       c1 = SecretSharing::Shamir::Container.new(2)
-# FIXME : Major Perf Issue : If OpenSSL::BN::rand(512) is given with 4096 instead of 512 this takes FOREVER
-      c1.secret  = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN::rand(512))
+      # FIXME : Major Perf Issue : Large bit length secrets (>4096) cause major perf issue.
+      random_num = RbNaCl::Util.bin2hex(RbNaCl::Random.random_bytes(32).to_s).to_i(16)
+      c1.secret = SecretSharing::Shamir::Secret.new(:secret => random_num )
       shares = c1.shares
       shares.size.must_equal(2)
       uniq_shares = shares.uniq
@@ -177,8 +178,9 @@ describe SecretSharing::Shamir::Container do
 
     it 'should generate unique shares for the max number of shares and a large secret' do
       c1 = SecretSharing::Shamir::Container.new(512)
-# FIXME : Major Perf Issue : If OpenSSL::BN::rand(512) is given with 4096 instead of 512 this takes FOREVER
-      c1.secret  = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN::rand(512))
+      # FIXME : Major Perf Issue : Large bit length secrets (>4096) cause major perf issue.
+      random_num = RbNaCl::Util.bin2hex(RbNaCl::Random.random_bytes(32).to_s).to_i(16)
+      c1.secret = SecretSharing::Shamir::Secret.new(:secret => random_num )
       shares = c1.shares
       shares.size.must_equal(512)
       uniq_shares = shares.uniq
@@ -272,8 +274,8 @@ describe SecretSharing::Shamir::Container do
 
       # This exposed a bug in the prime number generation; for instance 4*8
       # passes.
-      it 'should be able to recover secret with a bitlength of 5*8' do
-        secret = SecretSharing::Shamir::Secret.new(:secret => get_random_number(5*8))
+      it 'should be able to recover 40 bit secret' do
+        secret = SecretSharing::Shamir::Secret.new(:secret => get_random_number_with_bitlength(40))
         c = SecretSharing::Shamir::Container.new(4,2)
         c.secret = secret
 

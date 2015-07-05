@@ -18,22 +18,29 @@ module SecretSharing
   # Module for common methods shared across Container, Secret, or Share
   module Shamir
 
-    # Creates a random number of a certain bitlength, optionally ensuring
-    # the bitlength by setting the highest bit to 1.
-    def get_random_number(bitlength)
-      byte_length = (bitlength / 8.0).ceil
-      rand_hex = RbNaCl::Util.bin2hex(RbNaCl::Random.random_bytes(byte_length))
-      rand = OpenSSL::BN.new(rand_hex, 16)
+    # Create a random number of a specified Byte length
+    # returns Bignum
+    def get_random_number(bytes)
+      RbNaCl::Util.bin2hex(RbNaCl::Random.random_bytes(bytes).to_s).to_i(16)
+    end
 
-      begin
-        rand.mask_bits!(bitlength)
-      rescue OpenSSL::BNError
-        # never mind if there was an error, this just means
-        # rand was already smaller than 2^bitlength - 1
+    # Creates a random number of a exact bitlength
+    # returns Bignum
+    def get_random_number_with_bitlength(bits)
+      byte_length = (bits / 8.0).ceil + 5
+      random_num = get_random_number(byte_length)
+
+      # Convert to binary String of 1's and 0's
+      random_num_bin_str = random_num.to_s(2)
+
+      # Concatenate additional random binary String values
+      # until we have enought bits. Get five Bytes at a time.
+      while random_num_bin_str.length < bits
+        random_num_bin_str += get_random_number(5).to_s(2)
       end
 
-      rand.set_bit!(bitlength)
-      rand
+      # Return only the exact specified number of bits as a Numeric (Bignum)
+      random_num_bin_str.slice(0, bits).to_i(2)
     end
 
     # Creates a random prime number of *at least* bitlength
@@ -57,10 +64,10 @@ module SecretSharing
 
     # Evaluate the polynomial at x.
     def evaluate_polynomial_at(x, coefficients, prime)
-      result = OpenSSL::BN.new('0')
+      result = 0
 
       coefficients.each_with_index do |c, i|
-        result += c * OpenSSL::BN.new(x.to_s)**i
+        result += c * (x**i)
         result %= prime
       end
 

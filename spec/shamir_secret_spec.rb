@@ -18,10 +18,38 @@ require File.expand_path('../spec_helper', __FILE__)
 
 describe SecretSharing::Shamir::Secret do
 
-  describe 'initialization' do
+  describe 'initialization with OpenSSL::BN' do
 
     before do
       @num = OpenSSL::BN.new('1234567890')
+      @s = SecretSharing::Shamir::Secret.new(:secret => @num)
+    end
+
+    it 'must initialize with a random secret and set @secret and @bitlength by default' do
+      @s.secret.is_a?(Integer).must_equal(true)
+      @s.bitlength.is_a?(Integer).must_equal(true)
+    end
+
+  end # describe initialization with OpenSSL::BN
+
+  describe 'initialization with Integer' do
+
+    before do
+      @num = 12345
+      @s = SecretSharing::Shamir::Secret.new(:secret => @num)
+    end
+
+    it 'must initialize with a random secret and set @secret and @bitlength by default' do
+      @s.secret.is_a?(Integer).must_equal(true)
+      @s.bitlength.is_a?(Integer).must_equal(true)
+    end
+
+  end # describe initialization with Integer
+
+  describe 'initialization with Bignum' do
+
+    before do
+      @num = 12345678909123098902183908908213829013
       @s = SecretSharing::Shamir::Secret.new(:secret => @num)
     end
 
@@ -42,24 +70,20 @@ describe SecretSharing::Shamir::Secret do
     end
 
     it 'must initialize with a random secret and set @secret and @bitlength by default' do
-      @s.secret.is_a?(OpenSSL::BN).must_equal(true)
+      @s.secret.is_a?(Integer).must_equal(true)
       @s.bitlength.is_a?(Integer).must_equal(true)
-    end
-
-    it 'must raise an ArgumentError if an Integer instead of an OpenSSL::BN is provided to the constructor' do
-      lambda { SecretSharing::Shamir::Secret.new(:secret => 1_234_567_890) }.must_raise(ArgumentError)
     end
 
     it 'must raise an ArgumentError if the bitlength of the secret is greater than MAX_BITLENGTH' do
       # 1234 * 1's is 4097 num_bits
-      lambda { SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN.new("#{'1' * 1234}")) }.must_raise(ArgumentError)
+      lambda { SecretSharing::Shamir::Secret.new(:secret => '1' * 1234) }.must_raise(ArgumentError)
     end
 
-    it 'must initialize with a fixed secret and set @secret and @bitlength to the same if passed an OpenSSL::BN' do
-      @s.secret.is_a?(OpenSSL::BN).must_equal(true)
+    it 'must initialize with a fixed secret and set @secret and @bitlength to the same if passed a Bignum' do
+      @s.secret.is_a?(Integer).must_equal(true)
       @s.secret.must_equal(@num)
       @s.bitlength.is_a?(Integer).must_equal(true)
-      @s.bitlength.must_equal(@num.num_bits)
+      @s.bitlength.must_equal(@num.bit_length)
     end
 
     it 'must throw an exception if initialized with a String that does not base64 re-hydrate as expected from the output of #to_s' do
@@ -74,7 +98,7 @@ describe SecretSharing::Shamir::Secret do
 
     it 'must use Base64.decode64 instead of Base64.urlsafe_decode64 on platform that is not true for Base64.respond_to?(:urlsafe_encode64)' do
       Base64.stub(:respond_to?, false) do
-        num = OpenSSL::BN.new('1234567890123456789012345678901234567890')
+        num = 1234567890123456789012345678901234567890
         s1 = SecretSharing::Shamir::Secret.new(:secret => num)
         s1_str = s1.to_s
         s1_str.must_equal('MWl6aWJqZjR6dmRibXZxNjZkNndtOGcxY2k=')
@@ -87,7 +111,7 @@ describe SecretSharing::Shamir::Secret do
 
     it 'must decode to the SAME String on mixed platforms that are, or are not, truthy for Base64.respond_to?(:urlsafe_decode64)' do
 
-      # NOTE : OpenSSL::BN.new('1234567890123456789012345678901234567890')
+      # NOTE : 1234567890123456789012345678901234567890
       str = 'MWl6aWJqZjR6dmRibXZxNjZkNndtOGcxY2k='
       s2 = nil
       s3 = nil
@@ -121,29 +145,29 @@ describe SecretSharing::Shamir::Secret do
   describe '==' do
 
     before do
-      @num = OpenSSL::BN.new('1234567890')
+      @num = 1234567890
       @s = SecretSharing::Shamir::Secret.new(:secret => @num)
     end
 
-    it 'must return true if two secrets have the same OpenSSL::BN set internally' do
+    it 'must return true if two secrets have the same Integer set internally' do
       s2 = @s
       (@s == s2).must_equal(true)
     end
 
-    it 'must return false if two secrets have different OpenSSL::BN set internally' do
-      s2 = SecretSharing::Shamir::Secret.new(:secret => OpenSSL::BN.new('987654321'))
+    it 'must return false if two secrets have different Integers set internally' do
+      s2 = SecretSharing::Shamir::Secret.new(:secret => 987654321)
       (@s == s2).must_equal(false)
     end
   end
 
   describe 'secret?' do
     before do
-      @num = OpenSSL::BN.new('1234567890')
+      @num = 1234567890
       @s = SecretSharing::Shamir::Secret.new(:secret => @num)
     end
 
     it 'must return true if a secret is set' do
-      @s.secret.is_a?(OpenSSL::BN).must_equal(true)
+      @s.secret.is_a?(Integer).must_equal(true)
       @s.secret?.must_equal(true)
     end
 
@@ -155,12 +179,12 @@ describe SecretSharing::Shamir::Secret do
 
   describe 'secret()' do
     before do
-      @num = OpenSSL::BN.new('1234567890')
+      @num = 1234567890
       @s = SecretSharing::Shamir::Secret.new(:secret => @num)
     end
 
     it 'must return true if a secret is set' do
-      @s.secret.is_a?(OpenSSL::BN).must_equal(true)
+      @s.secret.is_a?(Integer).must_equal(true)
       @s.secret?.must_equal(true)
     end
 
@@ -172,7 +196,7 @@ describe SecretSharing::Shamir::Secret do
 
   describe 'to_s' do
     it 'must return a proper and consistent URL safe encoded String representation of @secret and allow round trip of that String' do
-      num = OpenSSL::BN.new('1234567890123456789012345678901234567890')
+      num = 1234567890123456789012345678901234567890
       s1 = SecretSharing::Shamir::Secret.new(:secret => num)
       s1_str = s1.to_s
       s1_str.must_equal('MWl6aWJqZjR6dmRibXZxNjZkNndtOGcxY2k=')
@@ -185,7 +209,7 @@ describe SecretSharing::Shamir::Secret do
 
   describe 'valid_hmac?' do
     before do
-      @num = OpenSSL::BN.new('1234567890')
+      @num = 1234567890
       @s = SecretSharing::Shamir::Secret.new(:secret => @num)
     end
 
