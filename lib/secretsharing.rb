@@ -15,7 +15,6 @@
 # limitations under the License.
 
 require 'openssl'
-require 'digest/sha1'
 require 'rbnacl/libsodium'
 require 'rbnacl'
 require 'base64'
