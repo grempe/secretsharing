@@ -43,21 +43,102 @@ module SecretSharing
       random_num_bin_str.slice(0, bits).to_i(2)
     end
 
-    # Creates a random prime number of *at least* bitlength
-    def get_prime_number(bitlength)
-      # FIXME : bignum problem : another way to generate large primes?
-      # BN_generate_prime_ex() generates a pseudo-random prime number of ***at least*** bit length bits. If ret is not NULL, it will be used to store the number.
-      # https://wiki.openssl.org/index.php/Manual:BN_generate_prime(3)
+    # Supports #miller_rabin_prime?
+    def mod_exp(n, e, mod)
+      fail ArgumentError, 'negative exponent' if e < 0
+      prod = 1
+      base = n % mod
 
-      # FIXME : Why does generate_prime always return 35879 for bitlength 1-15
-      # OpenSSL::BN::generate_prime(1).to_i
-      # => 35879
-      # Do we need to make sure that prime_bitlength is not shorter than 64 bits?
-      # See : https://www.mail-archive.com/openssl-dev@openssl.org/msg18835.html
-      # See : http://ardoino.com/2005/11/maths-openssl-primes-random/
-      # See : http://www.openssl.org/docs/apps/genrsa.html  "Therefore the number of bits should not be less that 64."
+      until e.zero?
+        prod = (prod * base) % mod if e.odd?
+        e >>= 1
+        base = (base * base) % mod
+      end
 
-      OpenSSL::BN.generate_prime(bitlength)
+      prod
+    end
+
+    # An implementation of the miller-rabin primality test.
+    # See : http://primes.utm.edu/prove/merged.html
+    # See : http://rosettacode.org/wiki/Miller-Rabin_primality_test#Ruby
+    # See : https://crypto.stackexchange.com/questions/71/how-can-i-generate-large-prime-numbers-for-rsa
+    # See : https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test
+    #
+    # Pseudocode:
+    # ###########
+    # Input: n > 3, an odd integer to be tested for primality;
+    # Input: k, a parameter that determines the accuracy of the test
+    # Output: composite if n is composite, otherwise probably prime
+    # write n − 1 as 2s·d with d odd by factoring powers of 2 from n − 1
+    # WitnessLoop: repeat k times:
+    #    pick a random integer a in the range [2, n − 2]
+    #    x ← ad mod n
+    #    if x = 1 or x = n − 1 then do next WitnessLoop
+    #    repeat s − 1 times:
+    #       x ← x2 mod n
+    #       if x = 1 then return composite
+    #       if x = n − 1 then do next WitnessLoop
+    #    return composite
+    # return probably prime
+    #
+    # Example : p primes = (3..1000).step(2).find_all {|i| miller_rabin_prime?(i,10)}
+    def miller_rabin_prime?(n, g = 1000)
+      return false if n == 1
+      return true if n == 2
+
+      d = n - 1
+      s = 0
+
+      while d % 2 == 0
+        d /= 2
+        s += 1
+      end
+
+      g.times do
+        a = 2 + rand(n - 4)
+        x = mod_exp(a, d, n) # x = (a**d) % n
+        next if x == 1 || x == n - 1
+        for r in (1..s - 1)
+          x = mod_exp(x, 2, n) # x = (x**2) % n
+          return false if x == 1
+          break if x == n - 1
+        end
+        return false if x != n - 1
+      end
+
+      true # probably
+    end
+
+    # See : http://planetmath.org/SafePrime
+    # See : https://en.wikipedia.org/wiki/Safe_prime
+    def safe_prime?(prime)
+      miller_rabin_prime?((prime - 1)/2)
+    end
+
+    # Finds a random prime number of *at least* bitlength
+    # Validate primeness using the miller-rabin primality test.
+    # Increment through odd numbers to test candidates until one is found.
+    # Generates 'safe' primes by default.
+    def get_prime_number(bitlength, safe = true)
+      prime_cand = get_random_number_with_bitlength(bitlength + 1)
+      prime_cand += 1 if prime_cand.even?
+
+      while !miller_rabin_prime?(prime_cand)
+        # keep it odd
+        prime_cand += 2
+
+        # must guarantee that returned primes are of *at least* bitlengh + 1
+        if prime_cand.bit_length < bitlength + 1
+          next
+        end
+
+        # only safe primes allowed by default
+        if safe && !safe_prime?(prime_cand)
+          next
+        end
+      end
+
+      prime_cand
     end
 
     # FIXME : Needs focused tests
@@ -94,8 +175,6 @@ module SecretSharing
       results.reduce { |a, e| a.mod_mul(e, prime) }
     end
 
-    # FIXME : Needs focused tests
-
     # Backported for Ruby 1.8.7, REE, JRuby, Rubinious
     def usafe_decode64(str)
       str = str.strip
@@ -107,8 +186,6 @@ module SecretSharing
         Base64.decode64(str)
       end
     end
-
-    # FIXME : Needs focused tests
 
     # Backported for Ruby 1.8.7, REE, JRuby, Rubinious
     def usafe_encode64(bin)
