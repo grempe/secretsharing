@@ -17,7 +17,6 @@
 module SecretSharing
   # Module for common methods shared across Container, Secret, or Share
   module Shamir
-
     # Create a random number of a specified Byte length
     # returns Bignum
     def get_random_number(bytes)
@@ -27,19 +26,11 @@ module SecretSharing
     # Creates a random number of a exact bitlength
     # returns Bignum
     def get_random_number_with_bitlength(bits)
-      byte_length = (bits / 8.0).ceil + 5
+      byte_length = (bits / 8.0).ceil + 10
       random_num = get_random_number(byte_length)
+      random_num_bin_str = random_num.to_s(2) # Get 1's and 0's
 
-      # Convert to binary String of 1's and 0's
-      random_num_bin_str = random_num.to_s(2)
-
-      # Concatenate additional random binary String values
-      # until we have enought bits. Get five Bytes at a time.
-      while random_num_bin_str.length < bits
-        random_num_bin_str += get_random_number(5).to_s(2)
-      end
-
-      # Return only the exact specified number of bits as a Numeric (Bignum)
+      # Slice off only the bits we require, convert Bits to Numeric (Bignum)
       random_num_bin_str.slice(0, bits).to_i(2)
     end
 
@@ -64,23 +55,6 @@ module SecretSharing
     # See : https://crypto.stackexchange.com/questions/71/how-can-i-generate-large-prime-numbers-for-rsa
     # See : https://en.wikipedia.org/wiki/Miller%E2%80%93Rabin_primality_test
     #
-    # Pseudocode:
-    # ###########
-    # Input: n > 3, an odd integer to be tested for primality;
-    # Input: k, a parameter that determines the accuracy of the test
-    # Output: composite if n is composite, otherwise probably prime
-    # write n − 1 as 2s·d with d odd by factoring powers of 2 from n − 1
-    # WitnessLoop: repeat k times:
-    #    pick a random integer a in the range [2, n − 2]
-    #    x ← ad mod n
-    #    if x = 1 or x = n − 1 then do next WitnessLoop
-    #    repeat s − 1 times:
-    #       x ← x2 mod n
-    #       if x = 1 then return composite
-    #       if x = n − 1 then do next WitnessLoop
-    #    return composite
-    # return probably prime
-    #
     # Example : p primes = (3..1000).step(2).find_all {|i| miller_rabin_prime?(i,10)}
     def miller_rabin_prime?(n, g = 1000)
       return false if n == 1
@@ -89,7 +63,7 @@ module SecretSharing
       d = n - 1
       s = 0
 
-      while d % 2 == 0
+      while d.even?
         d /= 2
         s += 1
       end
@@ -98,7 +72,7 @@ module SecretSharing
         a = 2 + rand(n - 4)
         x = mod_exp(a, d, n) # x = (a**d) % n
         next if x == 1 || x == n - 1
-        for r in (1..s - 1)
+        (1..s - 1).each do
           x = mod_exp(x, 2, n) # x = (x**2) % n
           return false if x == 1
           break if x == n - 1
@@ -109,34 +83,15 @@ module SecretSharing
       true # probably
     end
 
-    # See : http://planetmath.org/SafePrime
-    # See : https://en.wikipedia.org/wiki/Safe_prime
-    def safe_prime?(prime)
-      miller_rabin_prime?((prime - 1)/2)
-    end
-
     # Finds a random prime number of *at least* bitlength
     # Validate primeness using the miller-rabin primality test.
-    # Increment through odd numbers to test candidates until one is found.
-    # Generates 'safe' primes by default.
-    def get_prime_number(bitlength, safe = true)
+    # Increment through odd numbers to test candidates until a good prime is found.
+    def get_prime_number(bitlength)
       prime_cand = get_random_number_with_bitlength(bitlength + 1)
       prime_cand += 1 if prime_cand.even?
 
-      while !miller_rabin_prime?(prime_cand)
-        # keep it odd
-        prime_cand += 2
-
-        # must guarantee that returned primes are of *at least* bitlengh + 1
-        if prime_cand.bit_length < bitlength + 1
-          next
-        end
-
-        # only safe primes allowed by default
-        if safe && !safe_prime?(prime_cand)
-          next
-        end
-      end
+      # loop, adding 2 to keep it odd, until prime_cand is prime.
+      (prime_cand += 2) until miller_rabin_prime?(prime_cand)
 
       prime_cand
     end

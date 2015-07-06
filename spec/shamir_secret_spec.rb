@@ -17,9 +17,7 @@
 require File.expand_path('../spec_helper', __FILE__)
 
 describe SecretSharing::Shamir::Secret do
-
   describe 'initialization with OpenSSL::BN' do
-
     before do
       @num = OpenSSL::BN.new('1234567890')
       @s = SecretSharing::Shamir::Secret.new(:secret => @num)
@@ -29,11 +27,9 @@ describe SecretSharing::Shamir::Secret do
       @s.secret.is_a?(Integer).must_equal(true)
       @s.bitlength.is_a?(Integer).must_equal(true)
     end
-
   end # describe initialization with OpenSSL::BN
 
   describe 'initialization with Integer' do
-
     before do
       @num = 12345
       @s = SecretSharing::Shamir::Secret.new(:secret => @num)
@@ -43,11 +39,9 @@ describe SecretSharing::Shamir::Secret do
       @s.secret.is_a?(Integer).must_equal(true)
       @s.bitlength.is_a?(Integer).must_equal(true)
     end
-
   end # describe initialization with Integer
 
   describe 'initialization with Bignum' do
-
     before do
       @num = 12345678909123098902183908908213829013
       @s = SecretSharing::Shamir::Secret.new(:secret => @num)
@@ -110,7 +104,6 @@ describe SecretSharing::Shamir::Secret do
     end
 
     it 'must decode to the SAME String on mixed platforms that are, or are not, truthy for Base64.respond_to?(:urlsafe_decode64)' do
-
       # NOTE : 1234567890123456789012345678901234567890
       str = 'MWl6aWJqZjR6dmRibXZxNjZkNndtOGcxY2k='
       s2 = nil
@@ -139,11 +132,9 @@ describe SecretSharing::Shamir::Secret do
     it 'must throw an ArgumentError if an unknown option hash key is passed in' do
       lambda { SecretSharing::Shamir::Secret.new(:secret => 'foo\nbar', :unknown_arg => true) }.must_raise(ArgumentError)
     end
-
   end # describe initialization
 
   describe '==' do
-
     before do
       @num = 1234567890
       @s = SecretSharing::Shamir::Secret.new(:secret => @num)
@@ -226,7 +217,5 @@ describe SecretSharing::Shamir::Secret do
       @s.hmac = @s.hmac + 'a'
       @s.valid_hmac?.must_equal(false)
     end
-
   end
-
 end # describe SecretSharing::Shamir::Secret

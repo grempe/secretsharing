@@ -17,9 +17,7 @@
 require File.expand_path('../spec_helper', __FILE__)
 
 describe SecretSharing::Shamir::Container do
-
   describe 'initialization' do
-
     it 'will raise when instantiated with no args' do
       lambda { SecretSharing::Shamir::Container.new }.must_raise(ArgumentError)
     end
@@ -101,11 +99,9 @@ describe SecretSharing::Shamir::Container do
     it 'must return the correct max shares constant value' do
       SecretSharing::Shamir::Container::MAX_SHARES.must_equal(512)
     end
-
   end # describe initialization
 
   describe 'creating a container and setting a secret' do
-
     before do
       @num_shares = 5
       @c = SecretSharing::Shamir::Container.new(@num_shares)
@@ -142,11 +138,9 @@ describe SecretSharing::Shamir::Container do
     it 'must raise an exception if a secret is attempted to be set more than once' do
       lambda { @c.secret = SecretSharing::Shamir::Secret.new }.must_raise(ArgumentError)
     end
-
   end # creating a container and setting a secret
 
   describe 'generating shares when a secret is provided' do
-
     it 'should generate unique shares for the min number of shares and a tiny secret' do
       c1 = SecretSharing::Shamir::Container.new(2)
       c1.secret  = SecretSharing::Shamir::Secret.new(:secret => 123)
@@ -169,7 +163,7 @@ describe SecretSharing::Shamir::Container do
       c1 = SecretSharing::Shamir::Container.new(2)
       # FIXME : Major Perf Issue : Large bit length secrets (>4096) cause major perf issue.
       random_num = RbNaCl::Util.bin2hex(RbNaCl::Random.random_bytes(32).to_s).to_i(16)
-      c1.secret = SecretSharing::Shamir::Secret.new(:secret => random_num )
+      c1.secret = SecretSharing::Shamir::Secret.new(:secret => random_num)
       shares = c1.shares
       shares.size.must_equal(2)
       uniq_shares = shares.uniq
@@ -180,17 +174,15 @@ describe SecretSharing::Shamir::Container do
       c1 = SecretSharing::Shamir::Container.new(512)
       # FIXME : Major Perf Issue : Large bit length secrets (>4096) cause major perf issue.
       random_num = RbNaCl::Util.bin2hex(RbNaCl::Random.random_bytes(32).to_s).to_i(16)
-      c1.secret = SecretSharing::Shamir::Secret.new(:secret => random_num )
+      c1.secret = SecretSharing::Shamir::Secret.new(:secret => random_num)
       shares = c1.shares
       shares.size.must_equal(512)
       uniq_shares = shares.uniq
       shares.must_equal(uniq_shares)
     end
-
   end
 
   describe 'recovering a secret from a container' do
-
     before do
       @c1 = SecretSharing::Shamir::Container.new(5)    # creator
       @c2 = SecretSharing::Shamir::Container.new(5)    # recipient
@@ -202,7 +194,6 @@ describe SecretSharing::Shamir::Container do
     end
 
     describe 'with a mix of valid and invalid shares' do
-
       before do
         # set a secret on the 'creators'
         @c1.secret  = SecretSharing::Shamir::Secret.new
@@ -260,11 +251,9 @@ describe SecretSharing::Shamir::Container do
         @c2 << @c1.shares[3]
         lambda { @c2 << @c1.shares[4] }.must_raise(ArgumentError)
       end
-
     end
 
     describe 'with valid shares resulting from a random secret' do
-
       before do
         extend SecretSharing::Shamir
         # set a secret on both of the 'creators'
@@ -276,10 +265,10 @@ describe SecretSharing::Shamir::Container do
       # passes.
       it 'should be able to recover 40 bit secret' do
         secret = SecretSharing::Shamir::Secret.new(:secret => get_random_number_with_bitlength(40))
-        c = SecretSharing::Shamir::Container.new(4,2)
+        c = SecretSharing::Shamir::Container.new(4, 2)
         c.secret = secret
 
-        (0...4).to_a.permutation(2).collect{|e| e.sort}.uniq.each do |indexes|
+        (0...4).to_a.permutation(2).collect(&:sort).uniq.each do |indexes|
           c2 = SecretSharing::Shamir::Container.new(2)
           indexes.each do |index|
             c2 << c.shares[index]
@@ -367,9 +356,6 @@ describe SecretSharing::Shamir::Container do
         @c4.secret?.must_equal(true)
         @c4.secret.must_equal(@c3.secret)
       end
-
     end
-
   end # recovering a secret from a container
-
 end # describe SecretSharing::Shamir::Container

@@ -70,9 +70,7 @@ module SecretSharing
         fail ArgumentError, "Secret must be an Integer or OpenSSL::BN, not a '#{@secret.class}'" unless @secret.is_a?(Integer) || @secret.is_a?(OpenSSL::BN)
 
         # Normalize all secrets to a Numeric
-        if @secret.is_a?(OpenSSL::BN)
-          @secret = @secret.to_i
-        end
+        @secret = @secret.to_i if @secret.is_a?(OpenSSL::BN)
 
         # Get the number of binary bits in this secret's value.
         @bitlength = @secret.bit_length
@@ -85,8 +83,8 @@ module SecretSharing
       # Secrets are equal if the Numeric in @secret is the same.
       # Do secure constant-time comparison of the objects.
       def ==(other)
-        other_secret_hash = RbNaCl::Hash.blake2b(other.secret.to_s, {digest_size: 32})
-        own_secret_hash   = RbNaCl::Hash.blake2b(@secret.to_s, {digest_size: 32})
+        other_secret_hash = RbNaCl::Hash.blake2b(other.secret.to_s, digest_size: 32)
+        own_secret_hash   = RbNaCl::Hash.blake2b(@secret.to_s, digest_size: 32)
         RbNaCl::Util.verify32(other_secret_hash, own_secret_hash)
       end
 
@@ -111,12 +109,12 @@ module SecretSharing
       def valid_hmac?
         return false if !@secret.is_a?(Integer) || @hmac.to_s.empty? || @secret.to_s.empty?
         hash = RbNaCl::Hash.sha512(@secret.to_s)
-        key = hash[0,32]
+        key = hash[0, 32]
         authenticator = RbNaCl::Util.hex2bin(@hmac)
-        msg = hash[33,64]
+        msg = hash[33, 64]
         begin
           RbNaCl::HMAC::SHA256.verify(key, authenticator, msg)
-        rescue Exception => e
+        rescue
           false
         end
       end
@@ -131,8 +129,8 @@ module SecretSharing
       def generate_hmac
         return false if @secret.to_s.empty?
         hash = RbNaCl::Hash.sha512(@secret.to_s)
-        key = hash[0,32]
-        msg = hash[33,64]
+        key = hash[0, 32]
+        msg = hash[33, 64]
         @hmac = RbNaCl::Util.bin2hex(RbNaCl::HMAC::SHA256.auth(key, msg))
       end
     end # class Secret

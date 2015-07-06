@@ -17,9 +17,7 @@
 require File.expand_path('../spec_helper', __FILE__)
 
 describe SecretSharing::Shamir::Share do
-
   describe 'initialization' do
-
     before do
       @args = { :hmac => 'foo', :k => 3, :n => 4, :x => 1, :y => 1, :prime => 1, :prime_bitlength => 1 }
     end
@@ -53,7 +51,5 @@ describe SecretSharing::Shamir::Share do
       @s2 = SecretSharing::Shamir::Share.new(:hmac => 'foo', :k => 3, :n => 4, :x => 1, :y => 1, :prime => 1, :prime_bitlength => 1)
       @s1.must_equal(@s2)
     end
-
   end
-
 end

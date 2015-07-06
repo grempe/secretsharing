@@ -17,56 +17,49 @@
 require File.expand_path('../spec_helper', __FILE__)
 
 describe SecretSharing::Shamir do
-
   include SecretSharing::Shamir
 
-  describe "get_random_number" do
-
-    it "will return a Bignum" do
+  describe 'get_random_number' do
+    it 'will return a Bignum' do
       r = get_random_number(32)
       r.class.must_equal(Bignum)
     end
 
-    it "will return a Bignum with a size equaling the requested number of Bytes" do
-      bytes = 32
+    it 'will return a Bignum with a size equaling the requested number of Bytes' do
       r = get_random_number(32)
       r.class.must_equal(Bignum)
     end
-
   end
 
-  describe "get_random_number_with_bitlength" do
-
-    it "will return a Bignum" do
+  describe 'get_random_number_with_bitlength' do
+    it 'will return a Bignum' do
       bitlength = 256
       r = get_random_number_with_bitlength(bitlength)
       r.class.must_equal(Bignum)
     end
 
-    it "will return a random number of bitlength bits when bitlength is evenly divisible by 8" do
+    it 'will return a random number of bitlength bits when bitlength is evenly divisible by 8' do
       bitlength = 256
       r = get_random_number_with_bitlength(bitlength)
       r.bit_length.must_equal(bitlength)
     end
 
-    it "will return a random number of bitlength bits when bitlength is not evenly divisible by 8" do
+    it 'will return a random number of bitlength bits when bitlength is not evenly divisible by 8' do
       bitlength = 257
       r = get_random_number_with_bitlength(bitlength)
       r.bit_length.must_equal(bitlength)
     end
-
   end
 
-  describe "miller_rabin_prime?" do
-
-    it "will return true for the known primes <= 100" do
+  describe 'miller_rabin_prime?' do
+    it 'will return true for the known primes <= 100' do
       primes = [2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37, 41, 43, 47, 53, 59, 61, 67, 71, 73, 79, 83, 89, 97]
       primes.each do |p|
         miller_rabin_prime?(p, 1000).must_equal(true)
       end
     end
 
-    it "will return true for 128 bit known primes" do
+    it 'will return true for 128 bit known primes' do
       # each generated with: get_prime_number(128)
       # each was also confirmed to be prime with Wolfram Alpha "Is N prime?"
       primes = [
@@ -82,7 +75,7 @@ describe SecretSharing::Shamir do
       end
     end
 
-    it "will return true for 512 bit known primes" do
+    it 'will return true for 512 bit known primes' do
       # each generated with: get_prime_number(512)
       # each was also confirmed to be prime with Wolfram Alpha "Is N prime?"
       primes = [
@@ -98,7 +91,7 @@ describe SecretSharing::Shamir do
       end
     end
 
-    it "will return false for 128 bit known non-primes" do
+    it 'will return false for 128 bit known non-primes' do
       # each was also confirmed to NOT be prime with Wolfram Alpha "Is N prime?"
       # these are the same as the 128 bit primes + 2
       primes = [
@@ -113,51 +106,32 @@ describe SecretSharing::Shamir do
         miller_rabin_prime?(p, 1000).must_equal(false)
       end
     end
-
   end
 
-  describe "safe_prime?" do
-
-    it "will return true for a known safe prime" do
-      # https://en.wikipedia.org/wiki/Safe_prime
-      safe_prime?(1907).must_equal(true)
-    end
-
-    it "will return false for a known non-safe prime" do
-      safe_prime?(7135503311388034494783501211591374895653676819702605987897562731360996152374097).must_equal(false)
-    end
-
-  end
-
-  describe "get_prime_number" do
-
-    it "will return a random prime odd number" do
+  describe 'get_prime_number' do
+    it 'will return a random prime odd number' do
       p = get_prime_number(128)
       p.odd?.must_equal(true)
     end
 
-    it "will return a random prime number of at least the specified bit length + 1" do
+    it 'will return a random prime number of at least the specified bit length + 1' do
       bit_length = 128
       p = get_prime_number(bit_length)
       (p.bit_length >= bit_length + 1).must_equal(true)
     end
 
-    it "will return a random prime number that tests prime with the miller-rabin test" do
+    it 'will return a random prime number that tests prime with the miller-rabin test' do
       p = get_prime_number(128)
       miller_rabin_prime?(p).must_equal(true)
     end
-
   end
 
   describe 'usafe_encode64 and usafe_decode64' do
-
     it 'will encode and decode back to the original String' do
       str = MultiJson.dump(:foo => 'bar', :bar => 12_345_678_748_390_743_789)
       enc = usafe_encode64(str)
       dec = usafe_decode64(enc)
       dec.must_equal(str)
     end
-
   end
-
 end

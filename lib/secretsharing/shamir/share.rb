@@ -56,8 +56,8 @@ module SecretSharing
 
       # Do secure constant-time comparison of the objects.
       def ==(other)
-        other_share_hash = RbNaCl::Hash.blake2b(other.to_s, {digest_size: 32})
-        own_share_hash   = RbNaCl::Hash.blake2b(self.to_s, {digest_size: 32})
+        other_share_hash = RbNaCl::Hash.blake2b(other.to_s, digest_size: 32)
+        own_share_hash   = RbNaCl::Hash.blake2b(to_s, digest_size: 32)
         RbNaCl::Util.verify32(other_share_hash, own_share_hash)
       end
 

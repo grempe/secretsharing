@@ -27,3 +27,6 @@ AbcSize:
 
 GuardClause:
   MinBodyLength: 5
+
+NumericLiterals:
+  Enabled: false
