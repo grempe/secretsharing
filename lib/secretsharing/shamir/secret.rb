@@ -83,8 +83,11 @@ module SecretSharing
       end
 
       # Secrets are equal if the Numeric in @secret is the same.
+      # Do secure constant-time comparison of the objects.
       def ==(other)
-        other == @secret
+        other_secret_hash = RbNaCl::Hash.blake2b(other.secret.to_s, {digest_size: 32})
+        own_secret_hash   = RbNaCl::Hash.blake2b(@secret.to_s, {digest_size: 32})
+        RbNaCl::Util.verify32(other_secret_hash, own_secret_hash)
       end
 
       # Set a new secret forces regeneration of the HMAC
