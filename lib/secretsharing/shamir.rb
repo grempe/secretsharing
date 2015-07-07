@@ -110,6 +110,32 @@ module SecretSharing
       result
     end
 
+    def extended_gcd(a, b)
+      last_remainder = a.abs
+      remainder      = b.abs
+      x              = 0
+      last_x         = 1
+      y              = 1
+      last_y         = 0
+
+      until remainder.zero?
+        last_remainder, (quotient, remainder) = remainder, last_remainder.divmod(remainder)
+        x, last_x = last_x - quotient * x, x
+        y, last_y = last_y - quotient * y, y
+      end
+
+      [last_remainder, last_x * (a < 0 ? -1 : 1)]
+    end
+
+    # Calculate the Modular Inverse.
+    # See : http://rosettacode.org/wiki/Modular_inverse#Ruby
+    # Based on pseudo code from http://en.wikipedia.org/wiki/Extended_Euclidean_algorithm#Iterative_method_2
+    def invmod(e, et)
+      g, x = extended_gcd(e, et)
+      fail ArgumentError, 'Teh maths are broken!' if g != 1
+      x % et
+    end
+
     # FIXME : Needs focused tests
 
     # Part of the Lagrange interpolation.
@@ -122,12 +148,14 @@ module SecretSharing
       other_shares = shares.reject { |s| s.x == x }
 
       results = other_shares.map do |s|
-        minus_xi = OpenSSL::BN.new("#{-s.x}")
-        one_over_xj_minus_xi = OpenSSL::BN.new("#{x - s.x}").mod_inverse(prime)
-        minus_xi.mod_mul(one_over_xj_minus_xi, prime)
+        minus_xi = -s.x
+        # was OpenSSL::BN#mod_inverse
+        one_over_xj_minus_xi = invmod(x - s.x, prime)
+        # was OpenSSL::BN#mod_mul : (self * other) % m
+        (minus_xi * one_over_xj_minus_xi) % prime
       end
 
-      results.reduce { |a, e| a.mod_mul(e, prime) }
+      results.reduce { |a, e| (a * e) % prime }
     end
 
     # Backported for Ruby 1.8.7, REE, JRuby, Rubinious

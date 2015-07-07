@@ -126,6 +126,13 @@ describe SecretSharing::Shamir do
     end
   end
 
+  describe 'invmod' do
+    it 'will return a known value' do
+      # http://rosettacode.org/wiki/Modular_inverse#Ruby
+      invmod(42, 2017).must_equal(1969)
+    end
+  end
+
   describe 'usafe_encode64 and usafe_decode64' do
     it 'will encode and decode back to the original String' do
       str = MultiJson.dump(:foo => 'bar', :bar => 12_345_678_748_390_743_789)
