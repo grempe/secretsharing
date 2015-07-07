@@ -34,6 +34,14 @@ This code has not yet been tested in production.  It is seemingly well tested th
 
 The mathematics of the code, which is critical to its operation, and its suitability for use as a security product have not yet been tested or verified by security minded folks. `Yet`. If you are one of those strongly mathematically or security minded folks please do get in touch if you think you can help validate the current implementation. Suggestions or concerns welcome.
 
+## Supported platforms
+
+You can use `secretsharing` anywhere that [RbNaCl](https://github.com/cryptosphere/rbnacl) is supported and we do continuous integration testing on the following Ruby VMs:
+
+* MRI 2.0.0, 2.1.4, 2.2.2, HEAD
+* JRuby 1.7 (in both 1.8/1.9 mode)
+* Rubinius HEAD (in both 1.8/1.9 mode)
+
 ## Installation
 
 Add this line to your application's Gemfile:
