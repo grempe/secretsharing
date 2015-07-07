@@ -48,7 +48,7 @@ Or install it yourself as:
 
     $ gem install secretsharing
 
-## Usage in a Ruby/Rails project.
+## Example Usage
 
     require 'secretsharing'
 
@@ -58,7 +58,7 @@ Or install it yourself as:
     # create a random secret (returns the secret)
     c1.secret = SecretSharing::Shamir::Secret.new
 
-    # (or create a fixed secret of your choice by passing in an Integer or OpenSSL::BN in the :secret arg)
+    # or create a fixed secret of your choice by passing in an Integer in the :secret arg
     c1.secret = SecretSharing::Shamir::Secret.new(:secret => 123456789)
 
     # show secret

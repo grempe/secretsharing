@@ -17,19 +17,7 @@
 require File.expand_path('../spec_helper', __FILE__)
 
 describe SecretSharing::Shamir::Secret do
-  describe 'initialization with OpenSSL::BN' do
-    before do
-      @num = OpenSSL::BN.new('1234567890')
-      @s = SecretSharing::Shamir::Secret.new(:secret => @num)
-    end
-
-    it 'must initialize with a random secret and set @secret and @bitlength by default' do
-      @s.secret.is_a?(Integer).must_equal(true)
-      @s.bitlength.is_a?(Integer).must_equal(true)
-    end
-  end # describe initialization with OpenSSL::BN
-
-  describe 'initialization with Integer' do
+  describe 'initialization with Fixnum' do
     before do
       @num = 12345
       @s = SecretSharing::Shamir::Secret.new(:secret => @num)

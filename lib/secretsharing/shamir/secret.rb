@@ -22,7 +22,7 @@ module SecretSharing
     # can be the output from a Container that has successfully decoded shares.
     # A new Secret take 0 or 1 args. Zero args means the Secret will be initialized
     # with a random Numeric object with the Secret::DEFAULT_BITLENGTH. If a
-    # single argument is passed it can be a String, Integer, or OpenSSL::BN.
+    # single argument is passed it can be a String, or Integer.
     # If its a String, its expected to be of a special encoding
     # that was generated as the output of calling #to_s on another Secret object.
     # If the object type is an Integer it can be up to 4096 bits in length.
@@ -67,10 +67,7 @@ module SecretSharing
         end
 
         @secret = opts[:secret] if @secret.nil?
-        fail ArgumentError, "Secret must be an Integer or OpenSSL::BN, not a '#{@secret.class}'" unless @secret.is_a?(Integer) || @secret.is_a?(OpenSSL::BN)
-
-        # Normalize all secrets to a Numeric
-        @secret = @secret.to_i if @secret.is_a?(OpenSSL::BN)
+        fail ArgumentError, "Secret must be an Integer, not a '#{@secret.class}'" unless @secret.is_a?(Integer)
 
         # Get the number of binary bits in this secret's value.
         @bitlength = @secret.bit_length
