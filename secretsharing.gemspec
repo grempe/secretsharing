@@ -3,7 +3,6 @@
 lib = File.expand_path('../lib', __FILE__)
 $LOAD_PATH.unshift(lib) unless $LOAD_PATH.include?(lib)
 require 'secretsharing/version'
-require 'english'
 
 Gem::Specification.new do |s|
   s.name              = 'secretsharing'
@@ -20,8 +19,7 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = 'secretsharing'
 
-  # See : https://github.com/bbatsov/rubocop/issues/75
-  s.files             = `git ls-files`.split($INPUT_RECORD_SEPARATOR)
+  s.files             = `git ls-files`.split($/)
   s.executables       = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.test_files        = s.files.grep(%r{^(test|spec|features)/})
   s.require_paths     = ['lib']
