@@ -78,7 +78,7 @@ module SecretSharing
       end
 
       def to_s
-        usafe_encode64(to_json)
+        Base64.urlsafe_encode64(to_json)
       end
 
       # Creates the shares by computing random coefficients for a polynomial
@@ -140,7 +140,7 @@ module SecretSharing
       private
 
       def unpack_share(share)
-        decoded  = usafe_decode64(share)
+        decoded  = Base64.urlsafe_decode64(share)
         h        = MultiJson.load(decoded, :symbolize_keys => true)
 
         @version         = h[:version].to_i                unless h[:version].nil?

@@ -63,7 +63,7 @@ module SecretSharing
           # See : Secret#to_s for forward encoding method.
           stripped_secret = opts[:secret].strip
           fail ArgumentError, 'invalid secret (empty String)' if stripped_secret.empty?
-          decoded_secret = usafe_decode64(stripped_secret)
+          decoded_secret = Base64.urlsafe_decode64(stripped_secret)
           fail ArgumentError, 'invalid secret (base64 decode returned nil or empty String)' if decoded_secret.empty?
           int_secret = decoded_secret.to_i(36)
           fail ArgumentError, 'invalid secret (not an Integer)' unless int_secret.is_a?(Integer)
@@ -104,7 +104,7 @@ module SecretSharing
         # Convert the Bignum to a Base 36 encoded String
         # Wrap the Base 36 encoded String as a URL safe Base 64 encoded String
         # Combined this should result in a relatively compact and portable String
-        usafe_encode64(@secret.to_s(36))
+        Base64.urlsafe_encode64(@secret.to_s(36))
       end
 
       # See : generate_hmac

@@ -132,13 +132,4 @@ describe SecretSharing::Shamir do
       invmod(42, 2017).must_equal(1969)
     end
   end
-
-  describe 'usafe_encode64 and usafe_decode64' do
-    it 'will encode and decode back to the original String' do
-      str = MultiJson.dump(:foo => 'bar', :bar => 12_345_678_748_390_743_789)
-      enc = usafe_encode64(str)
-      dec = usafe_decode64(enc)
-      dec.must_equal(str)
-    end
-  end
 end
