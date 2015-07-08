@@ -44,7 +44,7 @@ module SecretSharing
       # rubocop:disable Metrics/PerceivedComplexity
       def initialize(opts = {})
         opts = {
-          :secret => get_random_number(32) # Bytes
+          :secret => get_random_number(32) # 32 Bytes, 256 Bits
         }.merge!(opts)
 
         # override with options

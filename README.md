@@ -55,7 +55,7 @@ Installation also adds a `secretsharing` binary which you can use as a simple CL
     # create a container (c1) for 3 out of 5 secret sharing
     c1 = SecretSharing::Shamir::Container.new(5,3)
 
-    # create a default secret object with a 32 Byte (512 bit) random secret embedded
+    # create a default secret object with a 32 Byte (256 bit) random secret embedded
     c1.secret = SecretSharing::Shamir::Secret.new
 
     # or create a fixed secret of your choice by passing in a sufficiently
