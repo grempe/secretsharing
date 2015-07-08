@@ -14,12 +14,8 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# Backport support for Bignum#bit_length and Fixnum#bit_length which were added in Ruby 2.1
-# See : http://globaldev.co.uk/2014/05/ruby-2-1-in-detail/
-# See : https://github.com/marcandre/backports
-require 'backports/1.9.1/kernel/require_relative'
-require 'backports/2.1.0/bignum/bit_length'
-require 'backports/2.1.0/fixnum/bit_length'
+# custom local monkey-patches
+require 'backports/bit_length'
 
 require 'rbnacl/libsodium'
 require 'rbnacl'

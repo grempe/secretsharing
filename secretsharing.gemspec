@@ -28,7 +28,6 @@ Gem::Specification.new do |s|
   s.add_dependency 'rbnacl', '~> 3.2.0'
   s.add_dependency 'highline', '~> 1.7.2'
   s.add_dependency 'multi_json', '~> 1.11.2'
-  s.add_dependency 'backports', '~> 3.6.4'
 
   s.add_development_dependency 'mocha'
   s.add_development_dependency 'minitest'
