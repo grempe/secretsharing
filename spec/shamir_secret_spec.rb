@@ -56,9 +56,15 @@ describe SecretSharing::Shamir::Secret do
       @s.bitlength.is_a?(Integer).must_equal(true)
     end
 
+    it 'must not raise an ArgumentError if the bitlength of the secret is equal to MAX_BITLENGTH' do
+      str_bits = "1" * SecretSharing::Shamir::Secret::MAX_BITLENGTH
+      s = SecretSharing::Shamir::Secret.new(:secret => str_bits.to_i(2))
+      s.is_a?(SecretSharing::Shamir::Secret).must_equal(true)
+    end
+
     it 'must raise an ArgumentError if the bitlength of the secret is greater than MAX_BITLENGTH' do
-      # 1234 * 1's is 4097 num_bits
-      lambda { SecretSharing::Shamir::Secret.new(:secret => '1' * 1234) }.must_raise(ArgumentError)
+      str_bits = "1" * (SecretSharing::Shamir::Secret::MAX_BITLENGTH + 1)
+      lambda { SecretSharing::Shamir::Secret.new(:secret => str_bits.to_i(2)) }.must_raise(ArgumentError)
     end
 
     it 'must initialize with a fixed secret and set @secret and @bitlength to the same if passed a Bignum' do
