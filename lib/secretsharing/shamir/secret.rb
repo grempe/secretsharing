@@ -61,9 +61,14 @@ module SecretSharing
         if opts[:secret].is_a?(String)
           # Decode a Base64.urlsafe_encode64 String which contains a Base 36 encoded Bignum back into a Bignum
           # See : Secret#to_s for forward encoding method.
-          decoded_secret = usafe_decode64(opts[:secret])
-          fail ArgumentError, 'invalid base64 (returned nil or empty String)' if decoded_secret.empty?
-          @secret = decoded_secret.to_i(36)
+          stripped_secret = opts[:secret].strip
+          fail ArgumentError, 'invalid secret (empty String)' if stripped_secret.empty?
+          decoded_secret = usafe_decode64(stripped_secret)
+          fail ArgumentError, 'invalid secret (base64 decode returned nil or empty String)' if decoded_secret.empty?
+          int_secret = decoded_secret.to_i(36)
+          fail ArgumentError, 'invalid secret (not an Integer)' unless int_secret.is_a?(Integer)
+          fail ArgumentError, 'invalid secret (Integer bit length < 100)' unless int_secret.bit_length > 100
+          @secret = int_secret
         end
 
         @secret = opts[:secret] if @secret.nil?
