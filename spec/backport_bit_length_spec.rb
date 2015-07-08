@@ -16,42 +16,66 @@
 
 require File.expand_path('../spec_helper', __FILE__)
 
-# NOTE : these backport tests are only meaninful when run on
-# a Ruby runtime that doesn't natively support Bignum.bit_length
 describe 'Bignum#bit_length' do
   include SecretSharing::Shamir
 
-  it 'will return the expected bit_length for multiples of 256' do
-    [256, 512, 768, 1024].each do |i|
-      r = get_random_number_with_bitlength(i)
-      r.bit_length.must_equal(i)
+  it 'will return the expected bit_length for multiples of 256 using native version' do
+    # run only if there really is a native version
+    if Bignum.respond_to?(:bit_length)
+      [256, 512, 768, 1024].each do |i|
+        r = get_random_number_with_bitlength(i)
+        r.bit_length.must_equal(i)
+      end
     end
   end
 
-  it 'will return the expected bit_length for multiples of 256 + 1' do
-    [257, 513, 769, 1025].each do |i|
-      r = get_random_number_with_bitlength(i)
-      r.bit_length.must_equal(i)
+  it 'will return the expected bit_length for multiples of 256 using backport' do
+    Bignum.stub(:respond_to?, false) do
+      [256, 512, 768, 1024].each do |i|
+        r = get_random_number_with_bitlength(i)
+        r.bit_length.must_equal(i)
+      end
+    end
+  end
+
+  it 'will return the expected bit_length for multiples of 256 + 1 using backport' do
+    Bignum.stub(:respond_to?, false) do
+      [257, 513, 769, 1025].each do |i|
+        r = get_random_number_with_bitlength(i)
+        r.bit_length.must_equal(i)
+      end
     end
   end
 end
 
-# NOTE : these backport tests are only meaninful when run on
-# a Ruby runtime that doesn't natively support Fixnum.bit_length
 describe 'Fixnum#bit_length' do
   include SecretSharing::Shamir
 
-  it 'will return the expected bit_length for multiples of 8' do
-    [1, 8, 16, 24, 32].each do |i|
-      r = get_random_number_with_bitlength(i)
-      r.bit_length.must_equal(i)
+  it 'will return the expected bit_length for multiples of 8 using native version' do
+    # run only if there really is a native version
+    if Fixnum.respond_to?(:bit_length)
+      [1, 8, 16, 24, 32].each do |i|
+        r = get_random_number_with_bitlength(i)
+        r.bit_length.must_equal(i)
+      end
     end
   end
 
-  it 'will return the expected bit_length for multiples of 8 + 1' do
-    [2, 9, 17, 25, 33].each do |i|
-      r = get_random_number_with_bitlength(i)
-      r.bit_length.must_equal(i)
+  it 'will return the expected bit_length for multiples of 8 using backport' do
+    Fixnum.stub(:respond_to?, false) do
+      [1, 8, 16, 24, 32].each do |i|
+        r = get_random_number_with_bitlength(i)
+        r.bit_length.must_equal(i)
+      end
+    end
+  end
+
+  it 'will return the expected bit_length for multiples of 8 + 1 using backport' do
+    Fixnum.stub(:respond_to?, false) do
+      [2, 9, 17, 25, 33].each do |i|
+        r = get_random_number_with_bitlength(i)
+        r.bit_length.must_equal(i)
+      end
     end
   end
 end
