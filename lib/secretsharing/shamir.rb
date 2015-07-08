@@ -119,9 +119,11 @@ module SecretSharing
       last_y         = 0
 
       until remainder.zero?
+        # rubocop:disable Style/ParallelAssignment
         last_remainder, (quotient, remainder) = remainder, last_remainder.divmod(remainder)
         x, last_x = last_x - quotient * x, x
         y, last_y = last_y - quotient * y, y
+        # rubocop:enable Style/ParallelAssignment
       end
 
       [last_remainder, last_x * (a < 0 ? -1 : 1)]

@@ -41,6 +41,7 @@ module SecretSharing
 
       # FIXME : allow instantiating a secret with any random number bitlength you choose.
 
+      # rubocop:disable Metrics/PerceivedComplexity
       def initialize(opts = {})
         opts = {
           :secret => get_random_number(32) # Bytes
@@ -81,6 +82,7 @@ module SecretSharing
 
         generate_hmac
       end
+      # rubocop:enable Metrics/PerceivedComplexity
 
       # Secrets are equal if the Numeric in @secret is the same.
       # Do secure constant-time comparison of the objects.

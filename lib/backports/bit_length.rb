@@ -15,24 +15,24 @@ unless Range.method_defined? :bsearch
       from = self.begin
       to   = self.end
       unless from.is_a?(Numeric) && to.is_a?(Numeric)
-        raise TypeError, "can't do binary search for #{from.class}"
+        fail TypeError, "can't do binary search for #{from.class}"
       end
 
       midpoint = nil
       if from.is_a?(Integer) && to.is_a?(Integer)
-        convert = Proc.new{ midpoint }
+        convert = proc { midpoint }
       else
-        map = Proc.new do |pk, unpk, nb|
+        map = proc do |pk, unpk, nb|
           result, = [nb.abs].pack(pk).unpack(unpk)
           nb < 0 ? -result : result
         end
         from = map['D', 'q', to.to_f]
         to   = map['D', 'q', to.to_f]
-        convert = Proc.new{ map['q', 'D', midpoint] }
+        convert = proc { map['q', 'D', midpoint] }
       end
       to -= 1 if exclude_end?
       satisfied = nil
-      while from <= to do
+      while from <= to
         midpoint = (from + to).div(2)
         result = yield(cur = convert.call)
         case result
@@ -44,7 +44,7 @@ unless Range.method_defined? :bsearch
         when nil, false
           # nothing to do
         else
-          raise TypeError, "wrong argument type #{result.class} (must be numeric, true, false or nil)"
+          fail TypeError, "wrong argument type #{result.class} (must be numeric, true, false or nil)"
         end
 
         if result
@@ -64,12 +64,8 @@ unless Fixnum.method_defined? :bit_length
   # require 'backports/2.0.0/range/bsearch'
   class Fixnum
     def bit_length
-      n = if self >= 0
-        self + 1
-      else
-        -self
-      end
-      (0...8 * size).bsearch{|i| n <= (1 << i) }
+      n = self >= 0 ? self + 1 : -self
+      (0...8 * size).bsearch { |i| n <= (1 << i) }
     end
   end
 end

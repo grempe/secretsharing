@@ -1,3 +1,7 @@
+AllCops:
+  Exclude:
+    - 'lib/backports/**/*'
+
 LineLength:
   Enabled: false
 

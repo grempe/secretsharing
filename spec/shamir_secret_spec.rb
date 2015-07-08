@@ -57,13 +57,13 @@ describe SecretSharing::Shamir::Secret do
     end
 
     it 'must not raise an ArgumentError if the bitlength of the secret is equal to MAX_BITLENGTH' do
-      str_bits = "1" * SecretSharing::Shamir::Secret::MAX_BITLENGTH
+      str_bits = '1' * SecretSharing::Shamir::Secret::MAX_BITLENGTH
       s = SecretSharing::Shamir::Secret.new(:secret => str_bits.to_i(2))
       s.is_a?(SecretSharing::Shamir::Secret).must_equal(true)
     end
 
     it 'must raise an ArgumentError if the bitlength of the secret is greater than MAX_BITLENGTH' do
-      str_bits = "1" * (SecretSharing::Shamir::Secret::MAX_BITLENGTH + 1)
+      str_bits = '1' * (SecretSharing::Shamir::Secret::MAX_BITLENGTH + 1)
       lambda { SecretSharing::Shamir::Secret.new(:secret => str_bits.to_i(2)) }.must_raise(ArgumentError)
     end
 

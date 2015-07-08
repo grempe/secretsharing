@@ -19,7 +19,10 @@ Gem::Specification.new do |s|
 
   s.rubyforge_project = 'secretsharing'
 
+  # rubocop:disable Style/SpecialGlobalVars
   s.files             = `git ls-files`.split($/)
+  # rubocop:enable Style/SpecialGlobalVars
+
   s.executables       = s.files.grep(%r{^bin/}) { |f| File.basename(f) }
   s.test_files        = s.files.grep(%r{^(test|spec|features)/})
   s.require_paths     = ['lib']
