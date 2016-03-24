@@ -38,8 +38,8 @@ Gem::Specification.new do |s|
   s.add_development_dependency 'rb-fsevent'
   s.add_development_dependency 'rerun'
   s.add_development_dependency 'rubocop'
-  s.add_development_dependency 'bundler', '~> 1.10.3'
-  s.add_development_dependency 'rake', '~> 10.4'
+  s.add_development_dependency 'bundler'
+  s.add_development_dependency 'rake'
 
   # http://rubyquicktips.com/post/4438542511/heredoc-and-indent
   s.description = <<-EOF.gsub(/^ {4}/, '')

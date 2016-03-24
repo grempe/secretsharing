@@ -3,5 +3,4 @@
 :excludes:
 - spec
 - lib/secretsharing/version.rb
-- lib/backports/bit_length.rb
 :single_line_report: false
