@@ -37,7 +37,8 @@ module SecretSharing
 
       MAX_BITLENGTH = 4096
 
-      attr_accessor :secret, :bitlength, :hmac
+      attr_accessor :bitlength, :hmac
+      attr_reader :secret
 
       # FIXME : allow instantiating a secret with any random number bitlength you choose.
 
