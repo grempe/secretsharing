@@ -5,8 +5,8 @@ require 'rake/testtask'
 
 Rake::TestTask.new do |t|
   t.pattern = 'spec/*_spec.rb'
-  t.verbose = true
-  t.warning = false
+  t.verbose = false
+  t.warning = true
 end
 
 task :default => 'test'
