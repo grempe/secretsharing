@@ -1,5 +1,39 @@
 # SecretSharing
 
+# IMPORTANT NEWS
+
+**April 2016 - THIS GEM IS NO LONGER MAINTAINED**
+
+**Good news?** There is a newer better one!
+
+I have created a new `tss` [https://github.com/grempe/tss-rb](https://github.com/grempe/tss-rb)
+Ruby Gem (with CLI) that implements Threshold Secret Sharing.
+
+The new version is based on a mature specification, written by a professional
+Cryptogropher, and is compatible with at least one other Python implementation
+of that spec at the share level. It is **NOT** compatible with this
+`secretsharing` gem. There are a number of features of the new code which make
+it a better choice not the least of which are:
+
+* MUCH cleaner API, only two entry points (`TSS.split`, `TSS.combine`)
+* Split any arbitrary UTF-8 or US-ASCII String
+* SHA256 or SHA1 verification of every secret recovered
+* Verification hash is split along with the secret, the hash is not known to an attacker
+* A binary header with a unique identifier, and the threshold number of shares needed, no more guessing
+* More effective sanitization of args, and verification of share formats
+* Much cleaner codebase, which closely follows the spec as documented
+* Fewer dependencies
+* Cryptographically Signed Gem and repository
+* Binary and Text share format
+* Great test coverage.
+
+You can find the new code at:
+
+[GitHub : https://github.com/grempe/tss-rb](https://github.com/grempe/tss-rb)
+
+[RubyGems : https://rubygems.org/gems/tss](https://rubygems.org/gems/tss)
+
+
 ## Description
 A Ruby gem for sharing secrets using [Shamir's Secret Sharing](http://en.wikipedia.org/wiki/Shamir's_Secret_Sharing), which is an [information-theoretic](https://en.wikipedia.org/wiki/Information-theoretic_security) secure method to share secrets between trusted parties.
 
