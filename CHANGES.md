@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v2.0.1
+
+- Update gemspec description, no longer maintained.
+
 ## v2.0.0
 
 - Use RbNaCl for SHA-512 hash and HMAC SHA-256. Backward incompatible change with previous use of SHA-256.

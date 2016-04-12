@@ -16,5 +16,5 @@
 
 # Module for specifying the current version of the gem.
 module SecretSharing
-  VERSION = '2.0.0'
+  VERSION = '2.0.1'
 end

@@ -43,6 +43,8 @@ Gem::Specification.new do |s|
 
   # http://rubyquicktips.com/post/4438542511/heredoc-and-indent
   s.description = <<-EOF.gsub(/^ {4}/, '')
+    4/12/2016 - NO LONGER MAINTAINED - See README.md
+
     Shamirs Secret Sharing is an algorithm in cryptography. It is a
     form of secret sharing, where a secret is divided into parts,
     giving each participant its own unique part, where some of the
