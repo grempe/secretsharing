@@ -3,17 +3,9 @@ language: ruby
 gemfile: gemfiles/Gemfile.ci
 
 rvm:
-  - 2.0.0
-  - 2.1.4
-  - 2.2.2
-  - ruby-head
-  - jruby
-  - jruby-head
-  - rbx-2
+  - 2.1.0
+  - 2.2.0
+  - 2.3.0
 
 matrix:
   fast_finish: true
-  allow_failures:
-    - rvm: ruby-head
-    - rvm: jruby-head
-    - rvm: rbx-2
