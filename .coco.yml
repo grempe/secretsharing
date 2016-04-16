@@ -1,6 +1,6 @@
-:directories:
+:include:
 - lib
-:excludes:
+:exclude:
 - spec
 - lib/secretsharing/version.rb
 :single_line_report: false

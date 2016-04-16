@@ -34,7 +34,7 @@ Gem::Specification.new do |s|
 
   s.add_development_dependency 'mocha'
   s.add_development_dependency 'minitest'
-  s.add_development_dependency 'coco'
+  s.add_development_dependency 'coco', '~> 0.14.0'
   s.add_development_dependency 'rb-fsevent'
   s.add_development_dependency 'rerun'
   s.add_development_dependency 'rubocop'
